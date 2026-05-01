@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rotate Function Visualizer</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: #f9fafb;
+    color: #1f2937;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+}
+
+h1 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.container {
+    background: #ffffff;
+    padding: 22px;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+    width: 540px;
+}
+
+.input-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+input {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    font-size: 13px;
+}
+
+.small {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 10px;
+}
+
+.error {
+    color: #dc2626;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.label {
+    text-align: center;
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 10px;
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.box {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: #e0f2fe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.35s ease;
+}
+
+.highlight {
+    background: #38bdf8;
+    color: white;
+}
+
+.contrib {
+    background: #f1f5f9;
+    font-size: 12px;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+button, select {
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #e5e7eb;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+button:hover {
+    background: #d1d5db;
+}
+
+.info {
+    margin-top: 15px;
+    font-size: 13px;
+    text-align: center;
+}
+
+.value {
+    font-weight: 600;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Rotate Function Simulation</h1>
+
+<div class="container">
+
+    <div class="input-section">
+        <input id="inputArray" placeholder="Enter numbers (e.g. 1 2 3 4)">
+        <button onclick="setArray()">Set</button>
+    </div>
+
+    <div class="small">Format: space-separated integers (example: 4 3 2 6)</div>
+    <div id="error" class="error"></div>
+
+    <div class="label">i × a[i]</div>
+    <div class="row" id="contrib"></div>
+
+    <div class="label">Array</div>
+    <div class="row" id="array"></div>
+
+    <div class="info" id="info"></div>
+
+    <div class="controls">
+        <button onclick="play()">Play</button>
+        <button onclick="pause()">Pause</button>
+        <button onclick="next()">Next</button>
+        <button onclick="reset()">Reset</button>
+
+        <select onchange="changeSpeed(this.value)">
+            <option value="2000">0.25x</option>
+            <option value="1200">0.5x</option>
+            <option value="800" selected>1x</option>
+            <option value="400">2x</option>
+        </select>
+    </div>
+
+</div>
+
+<script>
+let nums = [4,3,2,6];
+let original = [...nums];
+let n = nums.length;
+
+let k = 0;
+let interval = null;
+let speed = 800;
+
+function validateInput(str) {
+    return /^-?\d+(\s+-?\d+)*$/.test(str.trim());
+}
+
+function setArray() {
+    let input = document.getElementById("inputArray").value;
+    let errorDiv = document.getElementById("error");
+
+    if (!validateInput(input)) {
+        errorDiv.innerText = "Invalid format. Example: 1 2 3 4";
+        return;
+    }
+
+    nums = input.trim().split(/\s+/).map(Number);
+
+    if (nums.length === 0) {
+        errorDiv.innerText = "Array cannot be empty.";
+        return;
+    }
+
+    errorDiv.innerText = "";
+    original = [...nums];
+    n = nums.length;
+    reset();
+}
+
+function calcF(arr) {
+    return arr.reduce((acc, val, i) => acc + i * val, 0);
+}
+
+function render(highlightIndex = -1) {
+    const arrDiv = document.getElementById("array");
+    const contribDiv = document.getElementById("contrib");
+
+    arrDiv.innerHTML = "";
+    contribDiv.innerHTML = "";
+
+    nums.forEach((val, i) => {
+        let box = document.createElement("div");
+        box.className = "box" + (i === highlightIndex ? " highlight" : "");
+        box.innerText = val;
+        arrDiv.appendChild(box);
+
+        let c = document.createElement("div");
+        c.className = "box contrib";
+        c.innerText = `${i}×${val}`;
+        contribDiv.appendChild(c);
+    });
+}
+
+function rotate() {
+    let last = nums.pop();
+    nums.unshift(last);
+}
+
+function next() {
+    rotate();
+    k++;
+
+    let F = calcF(nums);
+
+    render(0);
+
+    document.getElementById("info").innerHTML = `
+        Rotation k = <span class="value">${k}</span><br>
+        F(k) = <span class="value">${F}</span>
+    `;
+}
+
+function play() {
+    if(interval) return;
+    interval = setInterval(next, speed);
+}
+
+function pause() {
+    clearInterval(interval);
+    interval = null;
+}
+
+function reset() {
+    pause();
+    nums = [...original];
+    k = 0;
+
+    let F = calcF(nums);
+
+    render();
+
+    document.getElementById("info").innerHTML = `
+        Initial State<br>
+        F(0) = <span class="value">${F}</span>
+    `;
+}
+
+function changeSpeed(val) {
+    speed = parseInt(val);
+    if(interval) {
+        pause();
+        play();
+    }
+}
+
+reset();
+</script>
+
+</body>
+</html>
