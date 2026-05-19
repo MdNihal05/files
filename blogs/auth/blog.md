@@ -258,8 +258,7 @@ User → Todo App → Google Login
 
 ---
 
-![[image.png]]
-
+![](https://raw.githubusercontent.com/MdNihal05/files/refs/heads/main/blogs/auth/image.png)
 
 # Authorization
 
