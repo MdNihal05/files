@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>job hunt — verified links</title>
+<style>
+  :root {
+    --bg: #f7f2ea;
+    --text: #22201d;
+    --accent: #744626;
+    --muted: #5f574e;
+    --border: rgba(116,70,38,.18);
+    --surface: rgba(116,70,38,.06);
+    --badge-text: #f7f2ea;
+  }
+  [data-theme="dark"] {
+    --bg: #171615;
+    --text: #e6ded3;
+    --accent: #a3774b;
+    --muted: #9e9289;
+    --border: rgba(163,119,75,.2);
+    --surface: rgba(163,119,75,.07);
+    --badge-text: #171615;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    transition: background .2s, color .2s;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+  }
+
+  /* theme toggle */
+  #theme-toggle {
+    position: fixed;
+    top: 1.2rem;
+    right: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 6px;
+    padding: .3rem .6rem;
+    font-size: .8rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .15s;
+  }
+  #theme-toggle:hover { background: var(--border); }
+
+  /* page header */
+  .page-header { padding-bottom: 1.6rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+  .page-title { font-size: 1.35rem; font-weight: 700; letter-spacing: -.01em; margin: 0 0 .25rem; }
+  .page-sub { font-size: .78rem; color: var(--muted); margin: 0; }
+
+  /* section header */
+  .section-label {
+    font-size: .62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--accent);
+    margin: 2.2rem 0 1rem;
+  }
+
+  /* tier blocks */
+  .tier { padding: 1.4rem 0; border-bottom: 1px solid var(--border); }
+  .tier:last-child { border-bottom: none; }
+  .tier-header {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    margin-bottom: 1rem;
+  }
+  .tier-badge {
+    font-size: .56rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--badge-text);
+    background: var(--accent);
+    padding: .16rem .5rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .tier-title {
+    font-size: .92rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .tier-note {
+    font-size: .7rem;
+    color: var(--muted);
+    margin-left: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: .08rem .4rem;
+    white-space: nowrap;
+  }
+
+  /* res-card */
+  .res-card {
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    overflow: hidden;
+  }
+  .res-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0 .7rem;
+    padding: .75rem .95rem;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    transition: background .12s;
+    text-decoration: none;
+    color: inherit;
+  }
+  .res-row:last-child { border-bottom: none; }
+  .res-row:hover { background: var(--surface); }
+
+  .res-type {
+    font-size: .52rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: .1rem .26rem;
+    white-space: nowrap;
+  }
+  .res-name {
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .res-name span {
+    font-size: .73rem;
+    font-weight: 400;
+    color: var(--muted);
+    margin-left: .4rem;
+  }
+  .res-url {
+    font-size: .7rem;
+    color: var(--muted);
+    white-space: nowrap;
+    opacity: .7;
+  }
+
+  /* warn gate */
+  .gate {
+    border-left: 2px solid var(--accent);
+    background: var(--surface);
+    border-radius: 0 6px 6px 0;
+    padding: .75rem 1rem;
+    margin-bottom: 1.8rem;
+  }
+  .gate p { margin: 0; font-size: .8rem; color: var(--muted); line-height: 1.6; }
+  .gate strong { color: var(--accent); }
+
+  /* company table */
+  .ch-table { width: 100%; border-collapse: collapse; }
+  .ch-table th {
+    font-size: .62rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    font-weight: 700;
+    padding: .35rem .5rem .35rem 0;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  .ch-table td {
+    padding: .5rem .5rem .5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: .8rem;
+    color: var(--muted);
+    vertical-align: middle;
+  }
+  .ch-table tr:last-child td { border-bottom: none; }
+  .ch-table td:first-child {
+    font-weight: 600;
+    color: var(--text);
+    font-size: .8rem;
+    white-space: nowrap;
+  }
+  .ch-table td a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: .72rem;
+    opacity: .85;
+  }
+  .ch-table td a:hover { opacity: 1; text-decoration: underline; }
+  .ch-table .tbl-wrap {
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    overflow: hidden;
+    padding: 0 .95rem;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: .62rem;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: .08rem .32rem;
+    white-space: nowrap;
+  }
+  .tag.warn { color: #c26a00; border-color: rgba(194,106,0,.3); background: rgba(194,106,0,.06); }
+  .tag.ok { color: var(--accent); border-color: var(--border); }
+
+  /* divider */
+  hr { border: none; border-top: 1px solid var(--border); margin: 0; }
+</style>
+</head>
+<body>
+
+<button id="theme-toggle">◐ theme</button>
+
+<div class="container">
+
+  <div class="page-header">
+    <h1 class="page-title">job hunt</h1>
+    <p class="page-sub">verified links &middot; jun 2026 &middot; portals + high-paying orgs (≤2 yoe)</p>
+  </div>
+
+  <div class="gate">
+    <p>
+      <strong>scam flags —</strong>
+      never pay anyone on LinkedIn for a referral or resume review.
+      don't upload your phone number to Naukri (Resdex exposes it to spam/MLM callers).
+      TCS/Infosys offer letters only come through their official portals — not WhatsApp.
+    </p>
+  </div>
+
+  <!-- ── JOB PORTALS ── -->
+  <div class="section-label">job portals</div>
+
+  <div class="tier">
+    <div class="tier-header">
+      <span class="tier-badge">vetted</span>
+      <span class="tier-title">curated &amp; AI-matched</span>
+      <span class="tier-note">recommended first</span>
+    </div>
+    <div class="res-card">
+      <a class="res-row" href="https://work.mercor.com/" target="_blank" rel="noopener">
+        <span class="res-type">GLOBAL</span>
+        <span class="res-name">Mercor <span>AI-vetted &middot; India is #1 talent source &middot; remote contract roles &middot; $2B valuation</span></span>
+        <span class="res-url">work.mercor.com</span>
+      </a>
+      <a class="res-row" href="https://cutshort.io/" target="_blank" rel="noopener">
+        <span class="res-type">INDIA</span>
+        <span class="res-name">CutShort <span>AI-matched &middot; "every 3rd product eng in India" &middot; startup SDE-1 to SDE-2</span></span>
+        <span class="res-url">cutshort.io</span>
+      </a>
+      <a class="res-row" href="https://wellfound.com/jobs" target="_blank" rel="noopener">
+        <span class="res-type">GLOBAL</span>
+        <span class="res-name">Wellfound <span>ex-AngelList &middot; salary shown upfront &middot; YC/Sequoia-backed startups</span></span>
+        <span class="res-url">wellfound.com/jobs</span>
+      </a>
+      <a class="res-row" href="https://www.instahyre.com/" target="_blank" rel="noopener">
+        <span class="res-type">INDIA</span>
+        <span class="res-name">Instahyre <span>employers reach out to you &middot; less noise than Naukri &middot; tech only</span></span>
+        <span class="res-url">instahyre.com</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="tier">
+    <div class="tier-header">
+      <span class="tier-badge">broad</span>
+      <span class="tier-title">large reach — spam risk</span>
+      <span class="tier-note">use with caution</span>
+    </div>
+    <div class="res-card">
+      <a class="res-row" href="https://www.linkedin.com/jobs/" target="_blank" rel="noopener">
+        <span class="res-type">GLOBAL</span>
+        <span class="res-name">LinkedIn Jobs <span>80.6M fake accounts removed H2 2024 &middot; FAANG-bait mentor scams in India</span></span>
+        <span class="res-url">linkedin.com/jobs</span>
+      </a>
+      <a class="res-row" href="https://www.naukri.com/" target="_blank" rel="noopener">
+        <span class="res-type">INDIA</span>
+        <span class="res-name">Naukri <span>largest India reach &middot; Resdex exposes resume to spam &middot; use email-only, no phone</span></span>
+        <span class="res-url">naukri.com</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="tier">
+    <div class="tier-header">
+      <span class="tier-badge">india</span>
+      <span class="tier-title">niche &amp; fresher-friendly</span>
+    </div>
+    <div class="res-card">
+      <a class="res-row" href="https://internshala.com/jobs/" target="_blank" rel="noopener">
+        <span class="res-type">FRESHER</span>
+        <span class="res-name">Internshala <span>9,800+ live listings &middot; best for 0–1 YOE &middot; internships + first jobs</span></span>
+        <span class="res-url">internshala.com/jobs</span>
+      </a>
+      <a class="res-row" href="https://unstop.com/jobs" target="_blank" rel="noopener">
+        <span class="res-type">CAMPUS</span>
+        <span class="res-name">Unstop <span>competitions + jobs &middot; pre-final &amp; fresh grads &middot; ex-HackerEarth Recruit</span></span>
+        <span class="res-url">unstop.com/jobs</span>
+      </a>
+      <a class="res-row" href="https://www.hirist.tech/" target="_blank" rel="noopener">
+        <span class="res-type">INDIA</span>
+        <span class="res-name">hirist.tech <span>tech-only &middot; less junk than Naukri &middot; mid-senior signal</span></span>
+        <span class="res-url">hirist.tech</span>
+      </a>
+      <a class="res-row" href="https://www.foundit.in/" target="_blank" rel="noopener">
+        <span class="res-type">INDIA</span>
+        <span class="res-name">Foundit <span>ex-Monster India &middot; broad reach &middot; spam level similar to Naukri but smaller</span></span>
+        <span class="res-url">foundit.in</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="tier">
+    <div class="tier-header">
+      <span class="tier-badge">remote</span>
+      <span class="tier-title">global remote boards</span>
+    </div>
+    <div class="res-card">
+      <a class="res-row" href="https://weworkremotely.com/" target="_blank" rel="noopener">
+        <span class="res-type">GLOBAL</span>
+        <span class="res-name">We Work Remotely <span>40,600+ live jobs &middot; paid listings filter out spam &middot; highest signal remote board</span></span>
+        <span class="res-url">weworkremotely.com</span>
+      </a>
+      <a class="res-row" href="https://www.workatastartup.com/" target="_blank" rel="noopener">
+        <span class="res-type">YC</span>
+        <span class="res-name">Work at a Startup <span>YC-backed companies only &middot; high quality &middot; apply once, multiple companies</span></span>
+        <span class="res-url">workatastartup.com</span>
+      </a>
+      <a class="res-row" href="https://remoteok.com/" target="_blank" rel="noopener">
+        <span class="res-type">GLOBAL</span>
+        <span class="res-name">Remote OK <span>community-trusted &middot; dev/design focus &middot; good for contract roles</span></span>
+        <span class="res-url">remoteok.com</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── HIGH-PAYING ORGS ── -->
+  <div class="section-label" style="margin-top:2.8rem;">high-paying orgs — ≤2 yoe</div>
+
+  <div class="tier">
+    <div class="tier-header">
+      <span class="tier-badge">global</span>
+      <span class="tier-title">FAANG+ &amp; top tech</span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="ch-table">
+        <thead>
+          <tr>
+            <th>company</th>
+            <th>careers</th>
+            <th>entry-level</th>
+            <th>note</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Google</td>
+            <td><a href="https://www.google.com/about/careers/applications/" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ NG SWE</span></td>
+            <td>STEP intern &middot; new grad SWE · filter by experience</td>
+          </tr>
+          <tr>
+            <td>Meta</td>
+            <td><a href="https://www.metacareers.com/jobs" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ NG SWE</span></td>
+            <td>University recruiting &middot; Production Eng new grad</td>
+          </tr>
+          <tr>
+            <td>Amazon</td>
+            <td><a href="https://www.amazon.jobs/en/" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ SDE-I</span></td>
+            <td>SDE-I is true entry-level &middot; mass hiring</td>
+          </tr>
+          <tr>
+            <td>Apple</td>
+            <td><a href="https://jobs.apple.com/en-us/search" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ NG Eng</span></td>
+            <td>600+ live openings verified &middot; HW + SW roles</td>
+          </tr>
+          <tr>
+            <td>Microsoft</td>
+            <td><a href="https://careers.microsoft.com/" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ NG / SDET</span></td>
+            <td>Many new grad + SDET roles &middot; Bengaluru office strong</td>
+          </tr>
+          <tr>
+            <td>Uber</td>
+            <td><a href="https://jobs.uber.com/" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ NG Eng</span></td>
+            <td>NG engineering roles exist &middot; India ops too</td>
+          </tr>
+          <tr>
+            <td>Atlassian</td>
+            <td><a href="https://www.atlassian.com/company/careers" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ Campus</span></td>
+            <td>Campus recruiting &middot; Bengaluru office &middot; remote-first</td>
+          </tr>
+          <tr>
+            <td>Notion</td>
+            <td><a href="https://www.notion.com/careers" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag warn">⚠ mid-level</span></td>
+            <td>300+ openings &middot; mostly mid-level but worth checking</td>
+          </tr>
+          <tr>
+            <td>Stripe</td>
+            <td><a href="https://stripe.com/in/jobs" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag warn">⚠ rare NG</span></td>
+            <td>Very high bar &middot; rare new grad slots</td>
+          </tr>
+          <tr>
+            <td>Netflix</td>
+            <td><a href="https://jobs.netflix.com/" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag warn">⚠ 3+ YOE</span></td>
+            <td>Typically requires 3+ YOE &middot; very competitive</td>
+          </tr>
+          <tr>
+            <td>Anthropic</td>
+            <td><a href="https://www.anthropic.com/careers" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag warn">⚠ senior AI</span></td>
+            <td>Mostly senior AI/ML &middot; research pedigree needed</td>
+          </tr>
+          <tr>
+            <td>OpenAI</td>
+            <td><a href="https://openai.com/careers" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag warn">⚠ competitive</span></td>
+            <td>Research/Eng NG exists but very high bar</td>
+          </tr>
+          <tr>
+            <td>Airbnb</td>
+            <td><a href="https://careers.airbnb.com/" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag warn">⚠ limited</span></td>
+            <td>Competitive &middot; limited entry-level openings</td>
+          </tr>
+          <tr>
+            <td>Coinbase</td>
+            <td><a href="https://www.coinbase.com/careers" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag warn">⚠ cyclic</span></td>
+            <td>NG roles open in crypto bull cycles</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="tier">
+    <div class="tier-header">
+      <span class="tier-badge">india</span>
+      <span class="tier-title">unicorns &amp; high-growth startups</span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="ch-table">
+        <thead>
+          <tr>
+            <th>company</th>
+            <th>careers</th>
+            <th>entry-level</th>
+            <th>note</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Swiggy</td>
+            <td><a href="https://careers.swiggy.com/" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ SDE-1</span></td>
+            <td>Regular SDE-1 rolls &middot; food/logistics scale</td>
+          </tr>
+          <tr>
+            <td>Zomato</td>
+            <td><a href="https://www.zomato.com/careers" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ SDE-1</span></td>
+            <td>Active SDE-1 hiring &middot; visit directly (JS-rendered)</td>
+          </tr>
+          <tr>
+            <td>Flipkart</td>
+            <td><a href="https://www.flipkartcareers.com/" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ Campus</span></td>
+            <td>Campus + NG programs &middot; TurboHire ATS</td>
+          </tr>
+          <tr>
+            <td>PhonePe</td>
+            <td><a href="https://www.phonepe.com/careers/" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ SDE-1</span></td>
+            <td>High-growth fintech &middot; "PhonePe University" L&amp;D</td>
+          </tr>
+          <tr>
+            <td>Razorpay</td>
+            <td><a href="https://razorpay.com/jobs/" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ SDE-1</span></td>
+            <td>SDE-1 &middot; now AI-integrated engineering &middot; Greenhouse ATS</td>
+          </tr>
+          <tr>
+            <td>Groww</td>
+            <td><a href="https://groww.in/careers" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ SDE-1</span></td>
+            <td>50M+ users &middot; fintech &middot; Greenhouse ATS</td>
+          </tr>
+          <tr>
+            <td>Zepto</td>
+            <td><a href="https://zepto.talentrecruit.com/career-page" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ Active</span></td>
+            <td>Aggressive hiring &middot; well-funded q-commerce</td>
+          </tr>
+          <tr>
+            <td>Meesho</td>
+            <td><a href="https://www.meesho.io/careers" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ SDE-1</span></td>
+            <td>Social commerce &middot; e-commerce SDE-1 roles</td>
+          </tr>
+          <tr>
+            <td>CRED</td>
+            <td><a href="https://careers.cred.club/" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag warn">⚠ high bar</span></td>
+            <td>High bar but hires ≤2 YOE &middot; niche fintech</td>
+          </tr>
+          <tr>
+            <td>Paytm</td>
+            <td><a href="https://www.paytm.com/careers/" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ Entry</span></td>
+            <td>Large org &middot; varied entry-level &middot; Lever ATS</td>
+          </tr>
+          <tr>
+            <td>Ola</td>
+            <td><a href="https://www.olacabs.com/careers" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag ok">✓ Varied</span></td>
+            <td>Tech + ops roles &middot; TurboHire ATS</td>
+          </tr>
+          <tr>
+            <td>Zerodha</td>
+            <td><a href="https://careers.zerodha.com/" target="_blank" rel="noopener">↗ careers</a></td>
+            <td><span class="tag warn">⚠ rare</span></td>
+            <td>Small team ~1000 ppl &middot; rare openings &middot; high signal when open</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var btn = document.getElementById('theme-toggle');
+  var root = document.documentElement;
+  function getEff() {
+    var s = localStorage.getItem('plan-theme');
+    return s === 'dark' ? true : s === 'light' ? false : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function apply(d) {
+    root.setAttribute('data-theme', d ? 'dark' : 'light');
+    btn.textContent = d ? '◑ theme' : '◐ theme';
+  }
+  apply(getEff());
+  btn.addEventListener('click', function () {
+    var d = root.getAttribute('data-theme') === 'dark';
+    localStorage.setItem('plan-theme', d ? 'light' : 'dark');
+    apply(!d);
+  });
+})();
+</script>
+</body>
+</html>
