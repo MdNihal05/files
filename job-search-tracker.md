@@ -22,6 +22,23 @@ Deprioritize: Indeed, Apna (better for volume/services hiring, not product-compa
 
 ---
 
+## 1b. Remote / international vetted-talent platforms
+
+Different category from the India portals above — these vet you once, then
+match you to remote roles/contracts (mostly US/global companies). Genuinely
+higher signal-to-noise than cold-applying, but note the trade-offs below.
+
+- [ ] **[Turing](https://www.turing.com)** — built specifically for Indian/remote devs going full-time-equivalent remote for US companies. ~3M developers, 900+ clients. Vetting is a real ~8-hour technical + seniority assessment (challenging but that's what makes the matches real). Best fit for your profile of any on this list.
+- [ ] **[Mercor](https://work.mercor.com)** — fastest vetting (decision in 3-5 days), weekly pay, "Instant Offers" for pre-vetted talent. Originally SWE/ML-researcher focused but has expanded heavily into AI-training/eval gig work — check whether a listing is a real SWE role or an AI-eval gig before investing time.
+- [ ] **[Braintrust](https://www.usebraintrust.com)** — user-owned network, 0% fee to talent (client pays the fee, you keep 100% of your rate). Attracts strong clients (Nestlé, Porsche, Goldman Sachs, Nike listed as past clients). Skews senior/freelance-contract rather than full-time junior.
+- [ ] **[Toptal](https://www.toptal.com)** — most selective (~top 3%), highest rates, but the screening is long and better suited once you have a stronger portfolio/YOE than 1.5 years. Worth applying once, not a first stop.
+
+**Reality check:** these are strongest for contract/remote-consulting work, not
+classic full-time "SDE-2 at a product company" roles — use them as a parallel
+track, not a replacement for the India career-page track below.
+
+---
+
 ## 2. Company career pages — direct apply
 
 Bookmark the Greenhouse/Lever ATS link directly where known — it updates
@@ -70,4 +87,5 @@ nothing gets lost across tabs.
 
 ---
 
-*Research basis: Naukri vs LinkedIn comparison, r/Blind threads on India callback rates, Instahyre/Cutshort/Hirist comparisons, Wellfound India listings — compiled 2026-09-02.*
+*Research basis: Naukri vs LinkedIn comparison, r/Blind threads on India callback rates, Instahyre/Cutshort/Hirist comparisons, Wellfound India listings, Turing/Mercor/Braintrust/Toptal platform reviews — compiled 2026-09-02.*
+*A matching `job-search-tracker.html` (same data, checkboxes persist locally in your browser) lives in this same folder.*
