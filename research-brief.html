@@ -1,5 +1,5 @@
 <!doctype html>
-<title>School SaaS Notebook</title>
+<title>School SaaS</title>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -7,74 +7,56 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Literata:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
 <style>
   :root {
-    color-scheme: light dark;
-    --paper: #f6f1e4;
-    --paper-2: #efe8d6;
+    color-scheme: light;
+
+    /* ─────────────────────────────────────────
+       WARM WHITE / PALE SAND THEME
+    ───────────────────────────────────────── */
+    --paper: #faf8f2;
+    --paper-2: #f3eee3;
+
     --margin: #c65b4e;
+
     --ink: #2b2620;
     --ink-soft: #6b6152;
     --ink-faint: #9a9081;
-    --rule: #d9cfb8;
+
+    --rule: #ddd5c5;
+
     --primary: #1f3a5f;
     --primary-soft: #345779;
-    --primary-tint: #dbe6ee;
+    --primary-tint: #e8edf0;
+
     --verified-ink: #7c2418;
     --verified-bg: #f2d9d3;
+
     --reasoned-ink: #7a5313;
     --reasoned-bg: #efdfb8;
+
     --unverified-ink: #4a463d;
     --unverified-bg: #e4e0d3;
+
     --decision-ink: #2c5236;
     --decision-bg: #d9e6dc;
-    --shadow: 0 1px 0 rgba(43,38,32,0.08);
+
+    --shadow: 0 1px 0 rgba(43,38,32,0.06);
+
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --paper: #1c1a16;
-      --paper-2: #221f1a;
-      --margin: #d97a6b;
-      --ink: #ece6d6;
-      --ink-soft: #b8ae99;
-      --ink-faint: #837a68;
-      --rule: #33302a;
-      --primary: #7ba7d1;
-      --primary-soft: #9dc0e2;
-      --primary-tint: #23374a;
-      --verified-ink: #f2a99b;
-      --verified-bg: #3d2420;
-      --reasoned-ink: #eecb8c;
-      --reasoned-bg: #3c3016;
-      --unverified-ink: #cfc8b6;
-      --unverified-bg: #33302a;
-      --decision-ink: #a9d4b4;
-      --decision-bg: #22352a;
-    }
+
+  * {
+    box-sizing: border-box;
   }
-  :root[data-theme="dark"] {
-    --paper: #1c1a16;
-    --paper-2: #221f1a;
-    --margin: #d97a6b;
-    --ink: #ece6d6;
-    --ink-soft: #b8ae99;
-    --ink-faint: #837a68;
-    --rule: #33302a;
-    --primary: #7ba7d1;
-    --primary-soft: #9dc0e2;
-    --primary-tint: #23374a;
-    --verified-ink: #f2a99b;
-    --verified-bg: #3d2420;
-    --reasoned-ink: #eecb8c;
-    --reasoned-bg: #3c3016;
-    --unverified-ink: #cfc8b6;
-    --unverified-bg: #33302a;
-    --decision-ink: #a9d4b4;
-    --decision-bg: #22352a;
+
+  [hidden] {
+    display: none !important;
   }
-  * { box-sizing: border-box; }
-  [hidden] { display: none !important; }
-  img { max-width: 100%; }
+
+  img {
+    max-width: 100%;
+  }
+
   body {
     margin: 0;
     background: var(--paper);
@@ -83,6 +65,7 @@
     font-size: 16px;
     line-height: 1.6;
   }
+
   .page {
     max-width: 880px;
     margin: 0 auto;
@@ -90,14 +73,31 @@
     position: relative;
     z-index: 0;
   }
+
   @media (max-width: 640px) {
-    .page { padding: 32px 16px 72px; }
+    .page {
+      padding: 32px 16px 72px;
+    }
   }
 
-  .hand { font-family: "Inter", sans-serif; font-weight: 700; letter-spacing: -0.01em; }
-  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  .hand {
+    font-family: "Inter", sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
 
-  header.title-block { margin-bottom: 40px; }
+  .mono {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+
+  /* ─────────────────────────────────────────
+     HEADER
+  ───────────────────────────────────────── */
+
+  header.title-block {
+    margin-bottom: 40px;
+  }
+
   .kicker {
     font-family: "JetBrains Mono", monospace;
     font-size: 0.72rem;
@@ -105,6 +105,7 @@
     text-transform: uppercase;
     color: var(--ink-soft);
   }
+
   h1.doc-title {
     font-family: "Inter", sans-serif;
     font-weight: 800;
@@ -114,6 +115,7 @@
     margin: 6px 0 10px;
     color: var(--primary);
   }
+
   .status-ribbon {
     display: inline-flex;
     align-items: center;
@@ -128,13 +130,21 @@
     border-radius: 3px;
     transform: rotate(-1deg);
   }
+
   .subtitle {
     margin-top: 14px;
     color: var(--ink-soft);
     max-width: 60ch;
   }
 
-  section { margin: 56px 0; }
+  /* ─────────────────────────────────────────
+     SECTIONS
+  ───────────────────────────────────────── */
+
+  section {
+    margin: 56px 0;
+  }
+
   h2 {
     font-family: "Inter", sans-serif;
     font-weight: 800;
@@ -146,30 +156,52 @@
     align-items: baseline;
     gap: 10px;
   }
+
   h2 .num {
     font-family: "JetBrains Mono", monospace;
     font-size: 0.85rem;
     color: var(--ink-faint);
     font-weight: 600;
   }
+
   section > .lede {
     color: var(--ink-soft);
     font-size: 0.95rem;
     margin: 0 0 20px;
     max-width: 62ch;
   }
+
   h3 {
     font-family: "Literata", serif;
     font-weight: 600;
     font-size: 1.08rem;
     margin: 22px 0 8px;
   }
-  p { margin: 0 0 14px; }
-  ul, ol { padding-left: 1.3em; margin: 0 0 14px; }
-  li { margin-bottom: 8px; }
-  a { color: var(--primary); text-decoration-thickness: 1.5px; text-underline-offset: 2px; }
 
-  /* stamps */
+  p {
+    margin: 0 0 14px;
+  }
+
+  ul,
+  ol {
+    padding-left: 1.3em;
+    margin: 0 0 14px;
+  }
+
+  li {
+    margin-bottom: 8px;
+  }
+
+  a {
+    color: var(--primary);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 2px;
+  }
+
+  /* ─────────────────────────────────────────
+     STAMPS
+  ───────────────────────────────────────── */
+
   .stamp {
     display: inline-flex;
     align-items: center;
@@ -184,26 +216,74 @@
     border: 1.5px solid currentColor;
     white-space: nowrap;
   }
-  .stamp-verified { color: var(--verified-ink); background: var(--verified-bg); }
-  .stamp-reasoned { color: var(--reasoned-ink); background: var(--reasoned-bg); }
-  .stamp-unverified { color: var(--unverified-ink); background: var(--unverified-bg); }
-  .stamp-decision { color: var(--decision-ink); background: var(--decision-bg); }
 
-  /* tldr box */
+  .stamp-verified {
+    color: var(--verified-ink);
+    background: var(--verified-bg);
+  }
+
+  .stamp-reasoned {
+    color: var(--reasoned-ink);
+    background: var(--reasoned-bg);
+  }
+
+  .stamp-unverified {
+    color: var(--unverified-ink);
+    background: var(--unverified-bg);
+  }
+
+  .stamp-decision {
+    color: var(--decision-ink);
+    background: var(--decision-bg);
+  }
+
+  /* ─────────────────────────────────────────
+     TLDR BOX
+  ───────────────────────────────────────── */
+
   .tldr {
     background: var(--paper-2);
     border: 1.5px solid var(--rule);
     border-left: 5px solid var(--primary);
     border-radius: 4px;
     padding: 18px 20px;
+    box-shadow: var(--shadow);
   }
-  .tldr h2 { font-size: 1.3rem; margin-bottom: 10px; }
-  .tldr ul { margin: 0; padding-left: 1.2em; }
-  .tldr li { margin-bottom: 6px; font-size: 0.96rem; }
 
-  /* tables */
-  .table-wrap { overflow-x: auto; border: 1.5px solid var(--rule); border-radius: 4px; }
-  table { border-collapse: collapse; width: 100%; min-width: 480px; font-size: 0.92rem; }
+  .tldr h2 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+
+  .tldr ul {
+    margin: 0;
+    padding-left: 1.2em;
+  }
+
+  .tldr li {
+    margin-bottom: 6px;
+    font-size: 0.96rem;
+  }
+
+  /* ─────────────────────────────────────────
+     TABLES
+  ───────────────────────────────────────── */
+
+  .table-wrap {
+    overflow-x: auto;
+    border: 1.5px solid var(--rule);
+    border-radius: 4px;
+    background: var(--paper);
+    box-shadow: var(--shadow);
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 480px;
+    font-size: 0.92rem;
+  }
+
   thead th {
     text-align: left;
     font-family: "JetBrains Mono", monospace;
@@ -215,15 +295,34 @@
     padding: 10px 14px;
     border-bottom: 2px solid var(--rule);
   }
-  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
-  tbody tr:last-child td { border-bottom: none; }
 
-  /* graveyard cards */
+  tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover {
+    background: #f7f3ea;
+  }
+
+  /* ─────────────────────────────────────────
+     GRAVEYARD CARDS
+  ───────────────────────────────────────── */
+
   .graveyard {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(220px, 1fr)
+    );
     gap: 14px;
   }
+
   .grave-card {
     background: var(--paper-2);
     border: 1.5px solid var(--rule);
@@ -231,18 +330,39 @@
     padding: 14px 16px;
     font-size: 0.88rem;
     color: var(--ink-soft);
+    box-shadow: var(--shadow);
   }
-  .grave-card .glyph { font-family: "Caveat", cursive; font-size: 1.5rem; color: var(--primary); display:block; margin-bottom:4px; }
-  .grave-card b { color: var(--ink); }
 
-  /* diagram frame */
+  .grave-card .glyph {
+    font-family: "Caveat", cursive;
+    font-size: 1.5rem;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .grave-card b {
+    color: var(--ink);
+  }
+
+  /* ─────────────────────────────────────────
+     DIAGRAM
+  ───────────────────────────────────────── */
+
   .diagram {
     background: var(--paper-2);
     border: 1.5px solid var(--rule);
     border-radius: 6px;
     padding: 16px;
+    box-shadow: var(--shadow);
   }
-  .diagram svg { display: block; width: 100%; height: auto; }
+
+  .diagram svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
   .diagram-caption {
     font-family: "JetBrains Mono", monospace;
     font-size: 0.72rem;
@@ -251,26 +371,58 @@
     text-align: center;
   }
 
-  /* fork options */
-  .fork { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 14px; }
-  @media (min-width: 620px) { .fork { grid-template-columns: 1fr 1fr; } }
+  /* ─────────────────────────────────────────
+     FORK OPTIONS
+  ───────────────────────────────────────── */
+
+  .fork {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: 14px;
+  }
+
+  @media (min-width: 620px) {
+    .fork {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
   .fork-card {
     border: 1.5px solid var(--rule);
     border-radius: 4px;
     padding: 16px;
     background: var(--paper-2);
+    box-shadow: var(--shadow);
   }
-  .fork-card h4 { margin: 0 0 8px; font-family: "Inter", sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--primary); }
-  .fork-card p { font-size: 0.9rem; margin-bottom: 0; color: var(--ink-soft); }
 
-  /* details / interview guides */
+  .fork-card h4 {
+    margin: 0 0 8px;
+    font-family: "Inter", sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--primary);
+  }
+
+  .fork-card p {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    color: var(--ink-soft);
+  }
+
+  /* ─────────────────────────────────────────
+     DETAILS / INTERVIEW GUIDES
+  ───────────────────────────────────────── */
+
   details {
     border: 1.5px solid var(--rule);
     border-radius: 4px;
     background: var(--paper-2);
     margin-bottom: 12px;
     padding: 4px 18px;
+    box-shadow: var(--shadow);
   }
+
   summary {
     cursor: pointer;
     font-weight: 600;
@@ -281,7 +433,11 @@
     justify-content: space-between;
     gap: 12px;
   }
-  summary::-webkit-details-marker { display: none; }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
   summary::after {
     content: "+";
     font-family: "JetBrains Mono", monospace;
@@ -289,12 +445,34 @@
     color: var(--primary);
     flex-shrink: 0;
   }
-  details[open] summary::after { content: "\2212"; }
-  details ol { padding-left: 1.3em; padding-bottom: 14px; }
-  details .qgroup { font-family: "JetBrains Mono", monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); margin: 14px 0 4px; }
 
-  /* decisions checklist */
-  .checklist { list-style: none; padding: 0; }
+  details[open] summary::after {
+    content: "\2212";
+  }
+
+  details ol {
+    padding-left: 1.3em;
+    padding-bottom: 14px;
+  }
+
+  details .qgroup {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+    margin: 14px 0 4px;
+  }
+
+  /* ─────────────────────────────────────────
+     CHECKLIST
+  ───────────────────────────────────────── */
+
+  .checklist {
+    list-style: none;
+    padding: 0;
+  }
+
   .checklist li {
     display: flex;
     gap: 12px;
@@ -302,26 +480,24 @@
     padding: 10px 0;
     border-bottom: 1px dashed var(--rule);
   }
-  .checklist li:last-child { border-bottom: none; }
+
+  .checklist li:last-child {
+    border-bottom: none;
+  }
+
   .checklist .box {
     flex-shrink: 0;
-    width: 18px; height: 18px;
+    width: 18px;
+    height: 18px;
     border: 2px solid var(--primary);
     border-radius: 3px;
     margin-top: 3px;
+    background: #fffdf8;
   }
 
-  footer.sources {
-    margin-top: 64px;
-    padding-top: 24px;
-    border-top: 2px solid var(--rule);
-    font-size: 0.85rem;
-  }
-  footer.sources h2 { font-size:1.3rem; margin-bottom:4px;}
-  footer.sources .lede { margin-bottom: 16px; }
-  footer.sources ol { padding-left: 1.2em; }
-  footer.sources li { margin-bottom: 10px; color: var(--ink-soft); }
-  footer.sources li .takeaway { display: block; font-size: 0.85rem; margin-top: 2px; }
+  /* ─────────────────────────────────────────
+     NOTES
+  ───────────────────────────────────────── */
 
   .note {
     font-size: 0.85rem;
@@ -330,13 +506,76 @@
     padding-left: 12px;
     margin: 14px 0;
   }
+
+  /* ─────────────────────────────────────────
+     FOOTER / SOURCES
+  ───────────────────────────────────────── */
+
+  footer.sources {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 2px solid var(--rule);
+    font-size: 0.85rem;
+  }
+
+  footer.sources h2 {
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+  }
+
+  footer.sources .lede {
+    margin-bottom: 16px;
+  }
+
+  footer.sources ol {
+    padding-left: 1.2em;
+  }
+
+  footer.sources li {
+    margin-bottom: 10px;
+    color: var(--ink-soft);
+  }
+
+  footer.sources li .takeaway {
+    display: block;
+    font-size: 0.85rem;
+    margin-top: 2px;
+  }
+
+  /* ─────────────────────────────────────────
+     RESPONSIVE
+  ───────────────────────────────────────── */
+
+  @media (max-width: 640px) {
+    body {
+      font-size: 15px;
+    }
+
+    .diagram {
+      padding: 10px;
+      overflow-x: auto;
+    }
+
+    h2 {
+      font-size: 1.35rem;
+    }
+
+    .graveyard {
+      grid-template-columns: 1fr;
+    }
+
+    .table-wrap {
+      border-radius: 3px;
+    }
+  }
 </style>
+
 
 <div class="page">
 
   <header class="title-block">
     <div class="kicker">internal · working draft · not the client pitch</div>
-    <h1 class="doc-title">School SaaS — Research &amp; Strategy Notebook</h1>
+    <h1 class="doc-title">School SaaS — Research </h1>
     <span class="status-ribbon">draft — pending team review, not pushed / not final</span>
     <p class="subtitle">Everything here is desk research plus decisions still open for the team.
       Claims are stamped <span class="stamp stamp-verified">verified</span>,
