@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>way2analytics — full event test</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 680px; margin: 2rem auto; padding: 0 1.5rem; line-height: 1.6; }
+  button { display: block; margin: 0.4rem 0; padding: 0.6rem 1rem; cursor: pointer; }
+  a.testlink { display: block; margin: 0.4rem 0; }
+  #runid { background: #eef; padding: 0.8rem 1rem; border-left: 3px solid #66a; margin: 1rem 0; font-family: monospace; }
+  #log { background: #111; color: #0f0; font-family: monospace; font-size: 12px; padding: 1rem; height: 240px; overflow-y: auto; white-space: pre-wrap; margin-top: 2rem; }
+  h2 { margin-top: 2rem; border-top: 1px solid #ddd; padding-top: 1rem; }
+  .note { color: #666; font-size: 0.9em; }
+</style>
+</head>
+<body>
+
+<h1>way2analytics — full event test</h1>
+
+<div id="runid">Generating test id…</div>
+<p class="note">This id is unique to this page load. Query it with:
+<code>db.tracking_events.find({ site_id: "&lt;the id above&gt;" })</code></p>
+
+<h2>Automatic — page load &amp; leave</h2>
+<p class="note">Fire on their own: <code>page_view</code> on load, <code>page_leave</code> when you switch tabs or close this one.</p>
+
+<h2>Automatic — scroll (needs a tall page)</h2>
+<p class="note">Scroll to the bottom to fire 25/50/75/90% <code>scroll</code> events.</p>
+
+<h2>Automatic — outbound link click</h2>
+<a class="testlink" id="outbound" href="https://example.com/">Outbound link — fires a <code>click</code> event</a>
+
+<h2>Automatic — file download</h2>
+<a class="testlink" id="pdf" href="/whitepaper.pdf">PDF link — fires a <code>file_download</code> event</a>
+
+<h2>NOT automatic — same-site link</h2>
+<a class="testlink" id="samesite" href="#samesite-target">Same-site link — fires <strong>nothing</strong> automatically (proven earlier this session)</a>
+<p id="samesite-target" class="note">↑ that's the point: no event for this.</p>
+
+<h2>NOT automatic — a plain button</h2>
+<p class="note">Buttons never fire anything on their own (also proven this session) — this one calls <code>track()</code> explicitly to work at all.</p>
+<button id="btn-plain">Plain button (tracked manually)</button>
+
+<h2>Custom events — track()</h2>
+<button id="btn-signup">track('signup', {plan:'pro', seats:3})</button>
+<button id="btn-purchase">track('purchase', {amount:499.5}, {immediate:true})</button>
+<button id="btn-nested">track('nested_props', {a:{b:{c:'deep'}}, tags:['x','y']})</button>
+
+<h2>set() and consent()</h2>
+<button id="btn-setuser">set({user_id:'gh-pages-tester'})</button>
+<button id="btn-consent">consent('denied')</button>
+
+<div id="log"></div>
+
+<script>
+  // Unique per page load — this becomes the site_id, so every run is
+  // trivially isolated in queries without editing this file each time.
+  var runId = "gh_pages_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 6);
+  document.getElementById("runid").textContent = "site_id for this run: " + runId;
+  window.__w2a = { s: runId };
+
+  window.w2a = window.w2a || function () { (w2a.q = w2a.q || []).push(arguments); };
+  w2a("track", "stub_before_load", { via: "queue" }); // proves the stub queue works before the script tag below loads
+</script>
+<script async data-debug="true" src="https://d20m247hrbeug2.cloudfront.net/way2news-webviews/analytics/1789563516215_959.js"></script>
+
+<div style="height:1600px;background:linear-gradient(#eee,#fff);display:flex;align-items:center;justify-content:center;color:#999;margin-top:2rem;">
+  (tall filler — keep scrolling to trigger scroll events)
+</div>
+<p>You reached the bottom.</p>
+
+<script>
+  var logEl = document.getElementById("log");
+  var origDebug = console.debug;
+  console.debug = function () {
+    origDebug.apply(console, arguments);
+    logEl.textContent += Array.prototype.slice.call(arguments).join(" ") + "\n";
+    logEl.scrollTop = logEl.scrollHeight;
+  };
+
+  document.getElementById("outbound").addEventListener("click", function (e) { e.preventDefault(); });
+  document.getElementById("pdf").addEventListener("click", function (e) { e.preventDefault(); });
+
+  document.getElementById("btn-plain").onclick = function () {
+    w2a("track", "plain_button_click", { button_id: "btn-plain" });
+  };
+  document.getElementById("btn-signup").onclick = function () {
+    w2a("track", "signup", { plan: "pro", seats: 3 });
+  };
+  document.getElementById("btn-purchase").onclick = function () {
+    w2a("track", "purchase", { amount: 499.5 }, { immediate: true });
+  };
+  document.getElementById("btn-nested").onclick = function () {
+    w2a("track", "nested_props", { a: { b: { c: "deep" } }, tags: ["x", "y"] });
+  };
+  document.getElementById("btn-setuser").onclick = function () {
+    w2a("set", { user_id: "gh-pages-tester" });
+  };
+  document.getElementById("btn-consent").onclick = function () {
+    w2a("consent", "denied");
+  };
+</script>
+
+</body>
+</html>
