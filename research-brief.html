@@ -1,0 +1,686 @@
+<!doctype html>
+<title>School SaaS Notebook</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Literata:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    color-scheme: light dark;
+    --paper: #f6f1e4;
+    --paper-2: #efe8d6;
+    --margin: #c65b4e;
+    --ink: #2b2620;
+    --ink-soft: #6b6152;
+    --ink-faint: #9a9081;
+    --rule: #d9cfb8;
+    --primary: #1f3a5f;
+    --primary-soft: #345779;
+    --primary-tint: #dbe6ee;
+    --verified-ink: #7c2418;
+    --verified-bg: #f2d9d3;
+    --reasoned-ink: #7a5313;
+    --reasoned-bg: #efdfb8;
+    --unverified-ink: #4a463d;
+    --unverified-bg: #e4e0d3;
+    --decision-ink: #2c5236;
+    --decision-bg: #d9e6dc;
+    --shadow: 0 1px 0 rgba(43,38,32,0.08);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #1c1a16;
+      --paper-2: #221f1a;
+      --margin: #d97a6b;
+      --ink: #ece6d6;
+      --ink-soft: #b8ae99;
+      --ink-faint: #837a68;
+      --rule: #33302a;
+      --primary: #7ba7d1;
+      --primary-soft: #9dc0e2;
+      --primary-tint: #23374a;
+      --verified-ink: #f2a99b;
+      --verified-bg: #3d2420;
+      --reasoned-ink: #eecb8c;
+      --reasoned-bg: #3c3016;
+      --unverified-ink: #cfc8b6;
+      --unverified-bg: #33302a;
+      --decision-ink: #a9d4b4;
+      --decision-bg: #22352a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #1c1a16;
+    --paper-2: #221f1a;
+    --margin: #d97a6b;
+    --ink: #ece6d6;
+    --ink-soft: #b8ae99;
+    --ink-faint: #837a68;
+    --rule: #33302a;
+    --primary: #7ba7d1;
+    --primary-soft: #9dc0e2;
+    --primary-tint: #23374a;
+    --verified-ink: #f2a99b;
+    --verified-bg: #3d2420;
+    --reasoned-ink: #eecb8c;
+    --reasoned-bg: #3c3016;
+    --unverified-ink: #cfc8b6;
+    --unverified-bg: #33302a;
+    --decision-ink: #a9d4b4;
+    --decision-bg: #22352a;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  img { max-width: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Literata", Georgia, "Times New Roman", serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+    position: relative;
+    z-index: 0;
+  }
+  .page::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    bottom: 0;
+    left: 56px;
+    width: 2px;
+    background: var(--margin);
+    opacity: 0.35;
+  }
+  @media (max-width: 640px) {
+    .page::before { left: 14px; }
+    .page { padding: 32px 16px 72px; }
+  }
+
+  .hand { font-family: "Inter", sans-serif; font-weight: 700; letter-spacing: -0.01em; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+  header.title-block { margin-bottom: 40px; }
+  .kicker {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  h1.doc-title {
+    font-family: "Inter", sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    font-size: clamp(2rem, 4.4vw, 2.7rem);
+    line-height: 1.15;
+    margin: 6px 0 10px;
+    color: var(--primary);
+  }
+  .status-ribbon {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border: 2px solid var(--reasoned-ink);
+    color: var(--reasoned-ink);
+    background: var(--reasoned-bg);
+    border-radius: 3px;
+    transform: rotate(-1deg);
+  }
+  .subtitle {
+    margin-top: 14px;
+    color: var(--ink-soft);
+    max-width: 60ch;
+  }
+
+  section { margin: 56px 0; }
+  h2 {
+    font-family: "Inter", sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    font-size: 1.5rem;
+    color: var(--primary);
+    margin: 0 0 4px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  h2 .num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+    font-weight: 600;
+  }
+  section > .lede {
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    margin: 0 0 20px;
+    max-width: 62ch;
+  }
+  h3 {
+    font-family: "Literata", serif;
+    font-weight: 600;
+    font-size: 1.08rem;
+    margin: 22px 0 8px;
+  }
+  p { margin: 0 0 14px; }
+  ul, ol { padding-left: 1.3em; margin: 0 0 14px; }
+  li { margin-bottom: 8px; }
+  a { color: var(--primary); text-decoration-thickness: 1.5px; text-underline-offset: 2px; }
+
+  /* stamps */
+  .stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 3px;
+    border: 1.5px solid currentColor;
+    white-space: nowrap;
+  }
+  .stamp-verified { color: var(--verified-ink); background: var(--verified-bg); }
+  .stamp-reasoned { color: var(--reasoned-ink); background: var(--reasoned-bg); }
+  .stamp-unverified { color: var(--unverified-ink); background: var(--unverified-bg); }
+  .stamp-decision { color: var(--decision-ink); background: var(--decision-bg); }
+
+  /* tldr box */
+  .tldr {
+    background: var(--paper-2);
+    border: 1.5px solid var(--rule);
+    border-left: 5px solid var(--primary);
+    border-radius: 4px;
+    padding: 18px 20px;
+  }
+  .tldr h2 { font-size: 1.3rem; margin-bottom: 10px; }
+  .tldr ul { margin: 0; padding-left: 1.2em; }
+  .tldr li { margin-bottom: 6px; font-size: 0.96rem; }
+
+  /* tables */
+  .table-wrap { overflow-x: auto; border: 1.5px solid var(--rule); border-radius: 4px; }
+  table { border-collapse: collapse; width: 100%; min-width: 480px; font-size: 0.92rem; }
+  thead th {
+    text-align: left;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    background: var(--paper-2);
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--rule);
+  }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  /* graveyard cards */
+  .graveyard {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .grave-card {
+    background: var(--paper-2);
+    border: 1.5px solid var(--rule);
+    border-radius: 4px;
+    padding: 14px 16px;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+  .grave-card .glyph { font-family: "Caveat", cursive; font-size: 1.5rem; color: var(--primary); display:block; margin-bottom:4px; }
+  .grave-card b { color: var(--ink); }
+
+  /* diagram frame */
+  .diagram {
+    background: var(--paper-2);
+    border: 1.5px solid var(--rule);
+    border-radius: 6px;
+    padding: 16px;
+  }
+  .diagram svg { display: block; width: 100%; height: auto; }
+  .diagram-caption {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    color: var(--ink-faint);
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  /* fork options */
+  .fork { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 14px; }
+  @media (min-width: 620px) { .fork { grid-template-columns: 1fr 1fr; } }
+  .fork-card {
+    border: 1.5px solid var(--rule);
+    border-radius: 4px;
+    padding: 16px;
+    background: var(--paper-2);
+  }
+  .fork-card h4 { margin: 0 0 8px; font-family: "Inter", sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--primary); }
+  .fork-card p { font-size: 0.9rem; margin-bottom: 0; color: var(--ink-soft); }
+
+  /* details / interview guides */
+  details {
+    border: 1.5px solid var(--rule);
+    border-radius: 4px;
+    background: var(--paper-2);
+    margin-bottom: 12px;
+    padding: 4px 18px;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: 12px 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: "+";
+    font-family: "JetBrains Mono", monospace;
+    font-size: 1.1rem;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+  details[open] summary::after { content: "\2212"; }
+  details ol { padding-left: 1.3em; padding-bottom: 14px; }
+  details .qgroup { font-family: "JetBrains Mono", monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); margin: 14px 0 4px; }
+
+  /* decisions checklist */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist .box {
+    flex-shrink: 0;
+    width: 18px; height: 18px;
+    border: 2px solid var(--primary);
+    border-radius: 3px;
+    margin-top: 3px;
+  }
+
+  footer.sources {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 2px solid var(--rule);
+    font-size: 0.85rem;
+  }
+  footer.sources h2 { font-size:1.3rem; margin-bottom:4px;}
+  footer.sources .lede { margin-bottom: 16px; }
+  footer.sources ol { padding-left: 1.2em; }
+  footer.sources li { margin-bottom: 10px; color: var(--ink-soft); }
+  footer.sources li .takeaway { display: block; font-size: 0.85rem; margin-top: 2px; }
+
+  .note {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    border-left: 3px solid var(--ink-faint);
+    padding-left: 12px;
+    margin: 14px 0;
+  }
+</style>
+
+<div class="page">
+
+  <header class="title-block">
+    <div class="kicker">internal · working draft · not the client pitch</div>
+    <h1 class="doc-title">School SaaS — Research &amp; Strategy Notebook</h1>
+    <span class="status-ribbon">draft — pending team review, not pushed / not final</span>
+    <p class="subtitle">Everything here is desk research plus decisions still open for the team.
+      Claims are stamped <span class="stamp stamp-verified">verified</span>,
+      <span class="stamp stamp-reasoned">reasoned</span>, or
+      <span class="stamp stamp-unverified">unverified</span> — treat the stamp as literally as a lab
+      result, not decoration. Nothing here has been checked against a real teacher or principal yet.</p>
+  </header>
+
+  <section id="tldr">
+    <div class="tldr">
+      <h2>TL;DR — what the research says</h2>
+      <ul>
+        <li>The Indian school-ERP market has <b>60+ vendors</b> already selling attendance/fees/exams/role-based
+          access — the original feature list is table stakes, not a pitch.</li>
+        <li>The buyer (principal/trustee) and the daily user (teacher) are different people with different needs —
+          most rollouts fail because teachers, not admins, quietly stop using the tool.</li>
+        <li>Animated lectures, AI doubt-chatbots and auto-generated tests are <b>already mainstream</b>
+          (Extramarks, Teachmint, SPYRAL) — not a moat, a different and better-funded fight.</li>
+        <li>Chosen wedge: <b>teacher-adoption-first</b>, modeled on ClassDojo's bottom-up playbook — win the
+          teacher before selling the school.</li>
+        <li>Nothing above is validated with a real person yet. That's the next step, not the pitch deck.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="market">
+    <h2><span class="num">01</span> Market overview</h2>
+    <p class="lede">Who else is already selling this, and to whom.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Vendor</th><th>Known for</th><th>Pricing signal</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Teachmint</b></td><td>VC-funded, strong app, offline auto-sync, now adding AI (Smart Homework Creator, AI digital board)</td><td>—</td></tr>
+          <tr><td><b>Entab</b></td><td>Large chains, most mature accounting, rock-solid fee management, needs 4G for sync</td><td>₹30,000–1,50,000+/yr, quote-based</td></tr>
+          <tr><td><b>Fedena</b></td><td>One of India's oldest (open-source roots), comprehensive, good support/value</td><td>—</td></tr>
+          <tr><td><b>Extramarks</b></td><td>Content-first: AI studybot "ALEX" for doubts, AI lesson planning, interactive 3D lab videos</td><td>—</td></tr>
+          <tr><td><b>MyClassboard</b></td><td>SaaS-first, admission CRM, parent app (fees, transport)</td><td>—</td></tr>
+          <tr><td>Market-wide</td><td>—</td><td>₹10–50/student/month, or ₹9,000–2,00,000+/yr by size</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>What the actual buyer wants to see</h3>
+    <p>Principals, trustees and finance heads hold the budget — not teachers, not parents. They buy dashboards
+      that answer: which classes have the worst fee-default rate, when attendance is starting to drop, which
+      admission channel is actually working, and — for a trust running multiple schools — one consolidated
+      view instead of per-school reports stitched together by hand.</p>
+  </section>
+
+  <section id="graveyard">
+    <h2><span class="num">02</span> The adoption graveyard</h2>
+    <p class="lede">More useful than any feature list — this is every way a school has already tried a tool
+      like this and quietly stopped using it.</p>
+    <div class="graveyard">
+      <div class="grave-card"><span class="glyph">partnership, not product</span><b>Small schools (&lt;~600 students)</b> need hand-holding and phone/WhatsApp support, 2–3 modules to start — not a full suite dropped on day one.</div>
+      <div class="grave-card"><span class="glyph">unpaid extra work</span><b>Teachers</b> see data entry as work with zero personal benefit → they stop, admin can't force compliance.</div>
+      <div class="grave-card"><span class="glyph">nothing to check</span><b>Parent apps</b> get uninstalled when updates are rare — attendance once a day, fees once a month isn't sticky.</div>
+      <div class="grave-card"><span class="glyph">English-only</span><b>Language</b> — apps without local-language support fail in tier-2/3 towns.</div>
+      <div class="grave-card"><span class="glyph">results day</span><b>Servers crash</b> on result day / fee due-day — a scaling cost nobody budgets for until it happens.</div>
+      <div class="grave-card"><span class="glyph">paper, just in case</span><b>Schools keep paper backups</b> in parallel — trust in "cloud only" isn't there yet.</div>
+      <div class="grave-card"><span class="glyph">reported directly</span><b>Vendor complaints</b>: slow support response, breakage during updates, confusing linked workflows.</div>
+    </div>
+  </section>
+
+  <section id="architecture">
+    <h2><span class="num">03</span> Product architecture — three planes</h2>
+    <p class="lede">How the platform is structured underneath, in plain terms — one deployment serves every
+      school, every school-chain, and us as the operator, without any of them seeing each other's data.</p>
+    <div class="diagram">
+      <svg viewBox="0 0 800 500" role="img" aria-label="Three-plane architecture: control plane, group plane, school plane">
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="var(--ink-faint)" />
+          </marker>
+        </defs>
+        <!-- control plane -->
+        <rect x="20" y="16" width="760" height="136" rx="8" fill="var(--primary-tint)" stroke="var(--primary)" stroke-width="2"/>
+        <text x="40" y="46" class="hand" font-size="19" fill="var(--primary)">Control plane — you, the operator</text>
+        <text x="40" y="70" font-family="Literata,serif" font-size="12.5" fill="var(--ink-soft)">runs every tenant; a school never sees this layer</text>
+        <text x="40" y="94" font-family="JetBrains Mono, monospace" font-size="11.5" fill="var(--ink)">tenant lifecycle · licensing · billing · feature flags</text>
+        <text x="40" y="114" font-family="JetBrains Mono, monospace" font-size="11.5" fill="var(--ink)">content library · AI cost routing &amp; budgets</text>
+        <text x="40" y="134" font-family="JetBrains Mono, monospace" font-size="11.5" fill="var(--ink)">anonymised cross-school benchmarks · time-boxed, logged support access</text>
+
+        <line x1="400" y1="152" x2="400" y2="182" stroke="var(--ink-faint)" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- group plane -->
+        <rect x="20" y="182" width="760" height="116" rx="8" fill="var(--paper)" stroke="var(--primary-soft)" stroke-width="2" stroke-dasharray="2 5"/>
+        <text x="40" y="212" class="hand" font-size="18" fill="var(--primary-soft)">Group plane — a school chain or trust</text>
+        <text x="40" y="236" font-family="Literata,serif" font-size="12.5" fill="var(--ink-soft)">the layer most competitors forget — for anyone running 2+ schools together</text>
+        <text x="40" y="260" font-family="JetBrains Mono, monospace" font-size="11.5" fill="var(--ink)">cross-school rollups · shared curriculum &amp; question banks</text>
+        <text x="40" y="280" font-family="JetBrains Mono, monospace" font-size="11.5" fill="var(--ink)">group benchmarking · one consolidated bill · staff mobility across schools</text>
+
+        <line x1="400" y1="298" x2="400" y2="328" stroke="var(--ink-faint)" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- school plane -->
+        <rect x="20" y="328" width="760" height="156" rx="8" fill="var(--paper-2)" stroke="var(--rule)" stroke-width="2"/>
+        <text x="40" y="358" class="hand" font-size="19" fill="var(--ink)">School plane — one tenant, one school</text>
+        <text x="40" y="382" font-family="Literata,serif" font-size="12.5" fill="var(--ink-soft)">everything a principal, teacher or parent actually touches day to day</text>
+        <text x="40" y="406" font-family="JetBrains Mono, monospace" font-size="11.5" fill="var(--ink)">Ops: admissions · attendance · fees · transport · library · exams</text>
+        <text x="40" y="426" font-family="JetBrains Mono, monospace" font-size="11.5" fill="var(--ink)">People: staff · students · parents/guardians</text>
+        <text x="40" y="446" font-family="JetBrains Mono, monospace" font-size="11.5" fill="var(--ink)">Academic: boards · grades · sections · timetable · calendar</text>
+        <text x="40" y="466" font-family="JetBrains Mono, monospace" font-size="11.5" fill="var(--ink)">Learning: curriculum map · lessons · assessments · mastery graph (per-student skill tracking)</text>
+      </svg>
+    </div>
+    <p class="diagram-caption">super-admin (us) &gt; group / trust (a school chain, easy to miss in most competitors) &gt; individual school (day-to-day use)</p>
+    <p class="note">"Model routing &amp; budgets" = controlling which AI model handles which task and what it costs us per school,
+      centrally. "k-anonymised cross-tenant benchmarks" = comparing schools to each other in aggregate without ever
+      exposing one school's raw data to another.</p>
+  </section>
+
+  <section id="hierarchy">
+    <h2><span class="num">04</span> Who sees what — access &amp; data visibility</h2>
+    <p class="lede">Two things, kept separate on purpose: the org chart (who reports to whom), and visibility
+      (who is allowed to see which piece of data) — the second is fully configurable by each school's own admin,
+      not fixed by us.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 760 410" role="img" aria-label="Organisation hierarchy: school, admin, teachers, students, parents">
+        <defs>
+          <pattern id="hatchRed" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="0" y2="7" stroke="#c65b4e" stroke-width="1.4"/></pattern>
+          <pattern id="hatchYellow" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="0" y2="7" stroke="#c9a227" stroke-width="1.4"/></pattern>
+          <pattern id="hatchPink" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="0" y2="7" stroke="#c15c8e" stroke-width="1.4"/></pattern>
+          <pattern id="hatchGreen" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="0" y2="7" stroke="#3f8a5b" stroke-width="1.4"/></pattern>
+          <marker id="arrow2" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--ink-faint)"/></marker>
+        </defs>
+
+        <rect x="300" y="10" width="160" height="52" rx="8" fill="url(#hatchRed)" stroke="#c65b4e" stroke-width="2"/>
+        <text x="380" y="42" text-anchor="middle" class="hand" font-size="19" fill="#8a3a2f">school</text>
+
+        <line x1="380" y1="62" x2="380" y2="92" stroke="var(--ink-faint)" stroke-width="2" marker-end="url(#arrow2)"/>
+
+        <rect x="310" y="94" width="140" height="46" rx="8" fill="url(#hatchYellow)" stroke="#c9a227" stroke-width="2"/>
+        <text x="380" y="122" text-anchor="middle" class="hand" font-size="18" fill="#7a5f16">admin</text>
+        <text x="460" y="112" font-family="JetBrains Mono, monospace" font-size="11" fill="var(--ink-soft)">sets what's visible,</text>
+        <text x="460" y="126" font-family="JetBrains Mono, monospace" font-size="11" fill="var(--ink-soft)">per field, per role &#8594;</text>
+
+        <line x1="380" y1="140" x2="150" y2="182" stroke="var(--ink-faint)" stroke-width="2" marker-end="url(#arrow2)"/>
+        <line x1="380" y1="140" x2="380" y2="182" stroke="var(--ink-faint)" stroke-width="2" marker-end="url(#arrow2)"/>
+        <line x1="380" y1="140" x2="610" y2="182" stroke="var(--ink-faint)" stroke-width="2" marker-end="url(#arrow2)"/>
+
+        <rect x="70" y="184" width="160" height="50" rx="8" fill="url(#hatchPink)" stroke="#c15c8e" stroke-width="2"/>
+        <text x="150" y="214" text-anchor="middle" class="hand" font-size="17" fill="#8a3763">teacher</text>
+        <rect x="300" y="184" width="160" height="50" rx="8" fill="url(#hatchPink)" stroke="#c15c8e" stroke-width="2"/>
+        <text x="380" y="214" text-anchor="middle" class="hand" font-size="17" fill="#8a3763">teacher</text>
+        <rect x="530" y="184" width="160" height="50" rx="8" fill="url(#hatchPink)" stroke="#c15c8e" stroke-width="2"/>
+        <text x="610" y="214" text-anchor="middle" class="hand" font-size="17" fill="#8a3763">teacher</text>
+
+        <line x1="150" y1="234" x2="380" y2="276" stroke="var(--ink-faint)" stroke-width="2" marker-end="url(#arrow2)"/>
+        <line x1="380" y1="234" x2="380" y2="276" stroke="var(--ink-faint)" stroke-width="2" marker-end="url(#arrow2)"/>
+        <line x1="610" y1="234" x2="380" y2="276" stroke="var(--ink-faint)" stroke-width="2" marker-end="url(#arrow2)"/>
+
+        <rect x="60" y="278" width="640" height="58" rx="8" fill="url(#hatchGreen)" stroke="#3f8a5b" stroke-width="2"/>
+        <text x="380" y="313" text-anchor="middle" class="hand" font-size="19" fill="#245c3a">students</text>
+
+        <rect x="524" y="350" width="196" height="46" rx="8" fill="var(--paper)" stroke="var(--ink-faint)" stroke-width="2" stroke-dasharray="3 4"/>
+        <text x="622" y="378" text-anchor="middle" class="hand" font-size="15" fill="var(--ink-soft)">parent / guardian</text>
+        <line x1="622" y1="350" x2="622" y2="338" stroke="var(--ink-faint)" stroke-width="2" stroke-dasharray="3 4" marker-end="url(#arrow2)"/>
+      </svg>
+    </div>
+    <p class="diagram-caption">dashed line = consented, read-only view into a linked student's record — set per-field by the school's admin, not hardcoded by us</p>
+
+    <h3>Example: field-level visibility, admin-controlled</h3>
+    <p>Every record has fields, and every field's visibility is a setting the <i>school's own admin</i> chooses —
+      not a fixed rule we ship. A discipline note and a phone number don't need the same audience.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field / record</th><th>Admin</th><th>Teacher</th><th>Parent</th><th>Student</th></tr></thead>
+        <tbody>
+          <tr><td>Attendance (today)</td><td>full</td><td>own class</td><td>own child</td><td>self</td></tr>
+          <tr><td>Test scores</td><td>full</td><td>own subject/class</td><td>own child</td><td>self, after release</td></tr>
+          <tr><td>Fee status</td><td>full</td><td>hidden</td><td>own child</td><td>hidden</td></tr>
+          <tr><td>Health / medical notes</td><td>full</td><td>need-to-know only</td><td>own child</td><td>self</td></tr>
+          <tr><td>Discipline notes</td><td>full</td><td>own class only</td><td>own child, admin-released only</td><td>hidden</td></tr>
+          <tr><td>Contact info</td><td>full</td><td>own class</td><td>self, own child</td><td>hidden</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">This table is illustrative, not a spec — the actual permission model (per-field, per-role, per-record
+      exceptions) is a design task once the wedge is validated.</p>
+  </section>
+
+  <section id="migration">
+    <h2><span class="num">05</span> Migration</h2>
+    <p>Every incumbent's switching cost is the same: a school's data is already trapped in Excel sheets, a
+      previous ERP export, or a WhatsApp group history. Part of the offer is doing that migration <i>for</i>
+      them — not handing them an importer and a spreadsheet template. This directly targets the "schools keep
+      paper/old systems in parallel" failure mode in the graveyard above: if switching costs them nothing but
+      time on our side, the trust-in-cloud objection weakens.</p>
+  </section>
+
+  <section id="differentiators">
+    <h2><span class="num">06</span> Proposed differentiators — reality-checked</h2>
+    <p class="lede">Animated lectures (incl. lab experiments), automated tests, and an AI academic-assistant
+      chatbot — requested for inclusion, checked against the market before calling them a strength.</p>
+    <p><span class="stamp stamp-verified">verified</span> These are <b>already mainstream</b>, not a gap:
+      Extramarks ships "ALEX," an AI studybot that solves doubts instantly, plus AI lesson planning and
+      interactive 3D lab-style video. Teachmint has an AI-powered digital board with a "Smart Homework
+      Creator." Dedicated players (e.g. SPYRAL) sell AI lab simulations mapped to CBSE/ICSE with
+      auto-generated quizzes. One report puts <b>68% of Indian schools already using some AI teaching tool</b>,
+      commonly stacking 3–5 tools rather than one platform.</p>
+    <p>Building these doesn't create distance from the ERP incumbents — it moves the competitive set to
+      better-funded content/AI players (Extramarks-class), a different and more capital-intensive fight than
+      the lightweight adoption wedge below. Worth deciding on purpose:</p>
+    <div class="fork">
+      <div class="fork-card">
+        <h4>Option A</h4>
+        <p>Adoption-first now (Section 07's wedge). Add content/AI once there's a paying base. Smaller bet,
+          competes mainly with ERP vendors, not content studios.</p>
+      </div>
+      <div class="fork-card">
+        <h4>Option B</h4>
+        <p>Content/AI from day one. Bigger bet — competitive set now includes Extramarks, Teachmint-AI, SPYRAL.
+          Changes funding and build-time assumptions considerably.</p>
+      </div>
+    </div>
+    <p>One piece does support the adoption wedge directly either way: <b>automated tests</b> (auto-grading,
+      question-bank generation) saves a teacher time on something they already resent — a concrete week-one
+      hook. Animated lectures and a student-facing chatbot serve a different audience (students) and a
+      different motive (content quality) — not the teacher-adoption problem itself.</p>
+  </section>
+
+  <section id="wedge">
+    <h2><span class="num">07</span> The wedge: win the teacher first</h2>
+    <p><span class="stamp stamp-verified">verified</span> Modeled on <b>ClassDojo</b>: it did not sell to
+      administrators first. One teacher, a free tool (behavior management + parent updates), reached 35,000
+      classrooms in 12 weeks by word of mouth, built by listening to ~20,000 teachers directly — eventually
+      ~90% of US schools, bottom-up. Its first version solved something small and immediately gratifying for a
+      teacher in week one, not a full admin-system replacement.</p>
+    <p>That's the shape of the bet: build something a teacher personally wants to keep using without being
+      told to, and let adoption spread the way ClassDojo's did — instead of selling a mandate to a principal
+      that teachers then quietly resent and abandon.</p>
+  </section>
+
+  <section id="evidence">
+    <h2><span class="num">08</span> Evidence quality</h2>
+    <p class="lede">What's actually established vs. still assumed — read this before repeating any claim above
+      to someone outside the team.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Claim</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Market is saturated, buyer ≠ user</td><td><span class="stamp stamp-verified">verified</span></td></tr>
+          <tr><td>Documented reasons ERP rollouts fail (Section 02)</td><td><span class="stamp stamp-verified">verified</span></td></tr>
+          <tr><td>ClassDojo succeeded via teacher-first, bottom-up adoption</td><td><span class="stamp stamp-verified">verified</span></td></tr>
+          <tr><td>Animated content / AI tutoring / auto-tests already mainstream in Indian edtech</td><td><span class="stamp stamp-verified">verified</span></td></tr>
+          <tr><td>Indian teachers are heavily overloaded (44.5% non-academic time, 48–55 hr weeks)</td><td><span class="stamp stamp-reasoned">reasoned</span> — this is <i>government</i>-school burden (census/mid-day-meal/election duty), not private-school ERP data-entry burden. Don't cite it as evidence teachers hate ERPs — wrong school type, wrong cause.</td></tr>
+          <tr><td>"Teachers specifically resent ERP data entry as unpaid extra work"</td><td><span class="stamp stamp-reasoned">reasoned</span> — repeated across vendor-adjacent blogs, no direct teacher testimony found yet. This is the whole premise of the wedge — validate it first.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="validation">
+    <h2><span class="num">09</span> Validation plan</h2>
+    <p class="lede">Two interview guides — will teachers actually adopt it voluntarily, and will the budget
+      holder tolerate/pay for a tool that entered the school bottom-up.</p>
+
+    <details>
+      <summary>Teacher interview guide <span class="mono" style="font-size:.75rem;color:var(--ink-faint)">8 questions</span></summary>
+      <p style="font-size:.88rem;color:var(--ink-soft)">Screening: school type (private, board — CBSE/ICSE/state), size, grades taught, years teaching, current digital tools in use.</p>
+      <div class="qgroup">current state</div>
+      <ol>
+        <li>Walk me through your day yesterday, end to end — where did time go that wasn't teaching?</li>
+        <li>What's the most annoying repetitive task you do for school administration (not teaching itself)?</li>
+        <li>Do you currently use any app/software for attendance, marks, or parent messages? Walk me through actually using it, right now if possible.</li>
+        <li>What do you do in parallel with that (paper register, personal WhatsApp, Excel)? Why both?</li>
+      </ol>
+      <div class="qgroup">pain validation</div>
+      <ol start="5">
+        <li>Has your school ever made you switch to a new software/app? What happened — did you keep using it 3 months later? Why or why not?</li>
+        <li>If a tool saved you 30 min/day, would you actually change your habit, or is habit-switching itself the cost regardless of time saved?</li>
+        <li>Who benefits when you enter attendance/marks into a system — you, the school, or the parent? Does that change how much effort you put in?</li>
+      </ol>
+      <div class="qgroup">wedge-specific / willingness</div>
+      <ol start="8">
+        <li>What would a tool have to do in the <i>first week</i> for you to keep using it without being told to?</li>
+      </ol>
+    </details>
+
+    <details>
+      <summary>Principal / trustee interview guide <span class="mono" style="font-size:.75rem;color:var(--ink-faint)">8 questions</span></summary>
+      <p style="font-size:.88rem;color:var(--ink-soft)">Screening: role (principal/trustee/finance head), school size, board, current ERP status (none / Excel+WhatsApp / named vendor), years in that decision seat.</p>
+      <div class="qgroup">current state</div>
+      <ol>
+        <li>How do you currently get attendance, fee-default, and exam data — who compiles it, how often, how do you trust it's accurate?</li>
+        <li>Have you evaluated or bought school management software before? What happened — still using it, switched away, or never got past the pilot?</li>
+        <li>If you did adopt something and it didn't stick, what actually broke — the software, teachers not using it, cost, or something else?</li>
+      </ol>
+      <div class="qgroup">pain validation</div>
+      <ol start="4">
+        <li>What's the one report or number you wish you could see instantly but currently can't (or takes too long to compile)?</li>
+        <li>What did teachers say when you rolled out your last new tool — resistance, indifference, adoption? Did you have to enforce it?</li>
+      </ol>
+      <div class="qgroup">wedge-specific — the actual test</div>
+      <ol start="6">
+        <li>If a tool got teachers using it voluntarily first — free, useful to them personally, no rollout mandate needed — would that make you more or less likely to trust/adopt it school-wide? Why?</li>
+        <li>Would you pay for a tool your teachers already use and like, even if it started as "shadow IT" you didn't choose?</li>
+      </ol>
+      <div class="qgroup">willingness signal</div>
+      <ol start="8">
+        <li>What would you need to see (data, a pilot, a reference school) before you'd sign a contract?</li>
+      </ol>
+    </details>
+  </section>
+
+  <section id="decisions">
+    <h2><span class="num">10</span> Decide as a team</h2>
+    <ul class="checklist">
+      <li><span class="box"></span><span><b>Section 06's fork</b> — Option A (adoption-first) vs Option B (content/AI from day one). This changes everything downstream; pick it on purpose, don't default into it.</span></li>
+      <li><span class="box"></span><span>Who's doing the 3–5 teacher interviews and 2–3 principal/trustee interviews, and by when?</span></li>
+      <li><span class="box"></span><span>If interviews contradict the wedge — pivot (small-school niche, tier-2/3 offline+vernacular) or kill?</span></li>
+      <li><span class="box"></span><span>Geography/segment scope for v1 — which city/board/school-size, concretely, not "India."</span></li>
+      <li><span class="box"></span><span>Field-level visibility model (Section 04) — who owns designing the real permission schema once the wedge is validated?</span></li>
+    </ul>
+  </section>
+
+  <footer class="sources">
+    <h2>Sources</h2>
+    <p class="lede">One line per source — what it actually contributed, so you don't have to re-open all ten to check.</p>
+    <ol>
+      <li><a href="https://vawsum.com/erp-selection-for-indian-schools-why-a-600-student-school-needs-a-completely-different-approach-from-a-2000-student-one/">Vawsum — small vs large school ERP needs</a><span class="takeaway">Why a &lt;600-student school and a 2000+ chain need fundamentally different ERP approaches — basis for Section 01/02's small-vs-large split.</span></li>
+      <li><a href="https://solutions.knwdle.com/blog/2026-04-28-school-erp-india-buying-guide">Knwdle — buying guide, buyer landscape</a><span class="takeaway">Who actually buys school software in India (principal/trustee/finance head) and what they check before signing — basis for Section 01's buyer persona.</span></li>
+      <li><a href="https://www.schoolcues.com/blog/erp-school-management-software-for-small-schools/">SchoolCues — small school ERP</a><span class="takeaway">Why generic full-suite ERP overwhelms small/budget schools instead of winning them.</span></li>
+      <li><a href="https://www.softwaresuggest.com/school-management-software">SoftwareSuggest — school management software comparison</a><span class="takeaway">Side-by-side listing of major Indian vendors, used to build the Section 01 vendor table.</span></li>
+      <li><a href="https://www.growthjockey.com/blogs/school-management-software">GrowthJockey — school management software India</a><span class="takeaway">Confirms the 60+ vendor, saturated-market picture.</span></li>
+      <li><a href="https://www.forbes.com/sites/kathleenchaykowski/2017/05/22/how-classdojo-built-one-of-the-most-popular-classroom-apps-by-listening-to-teachers/">Forbes — how ClassDojo built one of the most popular classroom apps by listening to teachers</a><span class="takeaway">How ClassDojo reached ~90% of US schools by winning teachers first — the precedent the whole wedge (Section 07) is modeled on.</span></li>
+      <li><a href="https://www.orfonline.org/research/using-ai-to-protect-teaching-time-and-improve-learning-quality-in-indian-schools">ORF — using AI to protect teaching time in Indian schools</a><span class="takeaway">Time-use data on Indian teacher workload — <i>government</i>-school specific; flagged as a different cause in Section 08, not proof teachers hate ERPs.</span></li>
+      <li><a href="https://www.extramarks.com/extra-intelligence">Extramarks — Extra Intelligence (AI features, ALEX studybot)</a><span class="takeaway">Confirms AI doubt-solving and animated lesson content are already shipped by a major incumbent — basis for Section 06's reality check.</span></li>
+      <li><a href="https://navneettoptech.com/blog/top-6-edtech-companies-schools-should-look-at-in-india-2026-guide">Navneet TopTech — top edtech companies for schools in India 2026</a><span class="takeaway">Landscape of top edtech players already competing for Indian schools.</span></li>
+      <li><a href="https://tryspyral.com/blog/best-interactive-simulations-india-2026">SPYRAL — best interactive simulations in India 2026</a><span class="takeaway">Confirms AI-powered lab simulations are already a live product category in India, not a gap.</span></li>
+    </ol>
+  </footer>
+
+</div>
