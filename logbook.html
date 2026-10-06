@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logbook</title>
+<style>
+body { max-width: 760px; margin: 0 auto; padding: 24px 16px 80px; background: #fff; color: #111; font: 15px/1.6 ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, monospace; }
+a { color: #111; }
+h1 { display: inline; font-size: 15px; margin: 0 16px 0 0; }
+nav { display: inline; }
+nav a { margin-right: 12px; text-decoration: none; color: #666; }
+nav a[aria-current] { color: #111; text-decoration: underline; }
+header { padding-bottom: 8px; border-bottom: 1px solid #ccc; margin-bottom: 20px; }
+h2 { font-size: 15px; margin: 28px 0 6px; }
+h3 { font-size: 15px; margin: 18px 0 2px; font-weight: 600; }
+ul { list-style: none; margin: 0; padding: 0; }
+li { padding: 5px 0; display: grid; grid-template-columns: 1.6em 1fr; }
+li .note { display: block; }
+.dim { color: #666; }
+.done a { color: #777; text-decoration: line-through; }
+.line { display: grid; grid-template-columns: 6.5em 3.8em 1fr; gap: 0 12px; }
+li.on { font-weight: 600; }
+form { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 16px; }
+input, select, button { font: inherit; padding: 2px 6px; border: 1px solid #aaa; background: #fff; color: #111; border-radius: 0; }
+input[type=text], input[type=url] { flex: 1 1 14em; min-width: 0; }
+button { cursor: pointer; }
+button.link { border: 0; padding: 0 4px; color: #666; background: none; }
+input[type=checkbox] { padding: 0; margin: 5px 0 0; align-self: start; justify-self: start; }
+textarea { width: 100%; height: 90px; font: 12px ui-monospace, monospace; }
+[hidden] { display: none !important; }
+@media (max-width: 560px) { .line { grid-template-columns: 6em 1fr; } .line .k { display: none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>logbook</h1>
+  <nav><a href="#log" id="n-log">log</a><a href="#resources" id="n-resources">resources</a></nav>
+</header>
+
+<div id="pg-log" hidden>
+  <p class="dim" id="summary"></p>
+  <form id="add" autocomplete="off">
+    <select name="k" aria-label="kind"><option>read</option><option>watch</option><option>write</option><option>build</option></select>
+    <input type="text" name="t" required maxlength="140" placeholder="what" aria-label="what">
+    <input type="url" name="u" placeholder="link (optional)" aria-label="link">
+    <input type="date" name="d" required aria-label="date">
+    <button type="submit">add</button>
+  </form>
+  <div id="ledger"></div>
+  <details style="margin-top:28px">
+    <summary class="dim">backup / restore</summary>
+    <p class="dim">Entries and progress are stored in this browser only. Copy this text to keep it; paste it back and restore on another browser.</p>
+    <textarea id="backup" spellcheck="false" aria-label="backup"></textarea>
+    <button type="button" id="restore">restore</button> <span id="restore-msg" class="dim"></span>
+  </details>
+</div>
+
+<div id="pg-resources" hidden>
+  <h2>on now</h2>
+  <div id="now"></div>
+  <h2>inbox</h2>
+  <div id="inbox"></div>
+  <p class="dim">Each bookmark is read, moved to a list below, or deleted. Past 30, stop saving until you are under 15.</p>
+  <div id="lanes"></div>
+</div>
+
+<script>
+// Catalogue + seed log. Edit this file to add resources or log lines.
+// Progress (done / active / inbox counts / log entries added in the page)
+// lives in the browser's localStorage — use Export on the Log tab to back it up.
+//   item kinds: read | watch | do        log kinds: read | watch | write | build
+window.LOG_DATA = {
+  lanes: [
+    { id: "sd", slot: "morning", title: "System design", items: [
+      { id: "sds-primer", k: "read", t: "System Design Primer", u: "https://systemdesignschool.io/primer", n: "Frame the whole field first." },
+      { id: "sd-roadmap", k: "read", t: "System design roadmap (yours)", u: "https://system-design-roadmap-01.vercel.app/#system-design", n: "The map and checklist — not something to read through." },
+      { id: "hinted-handoff", k: "read", t: "Hinted Handoff", u: "https://systemdesign.one/hinted-handoff/", n: "One article. Dynamo/Cassandra-style availability under failure." },
+      { id: "jordan-sd", k: "watch", t: "Systems Design Questions 3.0 — Jordan has no life", u: "https://www.youtube.com/playlist?list=PLjTveVh7FakLGZ36GbWAk_DMf_0xBZpGv", n: "Practice questions; after the primer." }
+    ]},
+    { id: "ds", slot: "morning", title: "Distributed systems", items: [
+      { id: "kleppmann", k: "watch", t: "Distributed Systems lectures — Martin Kleppmann", u: "https://www.youtube.com/playlist?list=PLeKd45zvjcDFUEv_ohr_HdUFe97RItdiB", n: "Start at 1.1." },
+      { id: "build-ds", k: "do", t: "Build Distributed Systems from Scratch", u: "https://builddistributedsystem.com/", n: "Hands-on challenges. Do alongside Kleppmann, not after." },
+      { id: "dicken-ddia", k: "watch", t: "Designing Data-Intensive Applications — Ben Dicken", u: "https://www.youtube.com/playlist?list=PLhgFs9q2EVg_rB-XT1zaJ3k9z0KVGrR2h", n: "Video companion to the book — pick one, not both at once." },
+      { id: "arpit", k: "watch", t: "Arpit Bhayani playlist (opens with Kafka exactly-once)", u: "https://www.youtube.com/playlist?list=PLsdq-3Z1EPT27BuTnJ_trF7BsaTpYLqst", n: "Channel inferred from the first video; playlist title not checked." }
+    ]},
+    { id: "db", slot: "morning", title: "Databases", items: [
+      { id: "cs186-n4", k: "read", t: "B+Trees — CS186 note 4", u: "https://cs186berkeley.net/notes/note4/", n: "First of the arc: B+Trees → Buffer Management → Query Optimization." },
+      { id: "cmu-445", k: "watch", t: "CMU 15-445 Intro to Database Systems, Fall 2025", u: "https://www.youtube.com/playlist?list=PLSE8ODhjZXjYMAgsGH-GtY5rJYZ6zjsd5", n: "Fall 2018 dropped as a duplicate of the same course." },
+      { id: "dicken-dbint", k: "watch", t: "Database Internals — Ben Dicken", u: "https://www.youtube.com/playlist?list=PLhgFs9q2EVg91l17UXoPdzsEhJrokLiMx", n: "Companion to Petrov's book." }
+    ]},
+    { id: "go", slot: "evening", title: "Go", items: [
+      { id: "fp-go", k: "read", t: "Go — from first principles (yours)", u: "https://from-first-principle.vercel.app/go", n: "Go days only." },
+      { id: "gingerbill", k: "read", t: "Memory Allocation Strategies — gingerBill", u: "https://www.gingerbill.org/series/memory-allocation-strategies/", n: "Arena, pool, free-list. Once Go memory / GC is on the table." }
+    ]},
+    { id: "tool", slot: "evening", title: "Systems, tooling, LLM systems", items: [
+      { id: "dicken-perf", k: "watch", t: "Make computers FAST — Systems Performance ch.1", u: "https://www.youtube.com/watch?v=RBpIzmOcPmw", n: "Was the thumbnail link you pasted." },
+      { id: "zed-pbt", k: "watch", t: "Zed Decoded — property-based testing", u: "https://www.youtube.com/playlist?list=PLS_6V8Q6PocNV-2cX2BwcE6HquuEEc-h-", n: "Also useful for stress-testing contest solutions." },
+      { id: "docker-l8", k: "read", t: "HTTP, HTTPS, DNS, reverse proxies — Docker module 1 lesson 8", u: "https://from-first-principle.vercel.app/docker/module-01-computer-foundations/lesson-08-http-https-dns-reverse-proxies", n: "Networking gap-filler (yours)." },
+      { id: "zachary", k: "watch", t: "Zachary Huang — playlists", u: "https://www.youtube.com/@ZacharyLLM/playlists", n: "Tutorials on building LLM agents and systems — not system design; keep it low priority." }
+    ]}
+  ],
+  inbox: [
+    { id: "x", name: "X bookmarks", u: "https://x.com", cap: 30 },
+    { id: "medium", name: "Medium", u: "https://medium.com", cap: 30 },
+    { id: "eng", name: "Company engineering blogs", u: "https://company-tech-blogs.vercel.app/", cap: 30 }
+  ],
+  log: [
+    { id: "s1", d: "2026-10-05", k: "build", t: "graph-vis: LeetCode-style input, 0/1 base, weights, labels", u: "https://graph-vis-0.vercel.app/" },
+    { id: "s2", d: "2026-10-05", k: "build", t: "Portfolio: “tools I built for myself” section", u: "" }
+  ]
+};
+</script>
+<script>
+"use strict";
+const D = window.LOG_DATA, KEY = "logbook.v1", KINDS = ["read", "watch", "write", "build"];
+const $ = s => document.querySelector(s);
+
+let S = { done: {}, active: {}, inbox: {}, log: [] };
+try { const r = JSON.parse(localStorage.getItem(KEY) || "null"); if (r && typeof r === "object") S = Object.assign(S, r); } catch (_) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (_) {} };
+
+const pad = n => String(n).padStart(2, "0");
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const today = () => ymd(new Date());
+const safeUrl = u => { try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : ""; } catch (_) { return ""; } };
+const host = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (_) { return ""; } };
+function h(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k.startsWith("on")) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? "" : v);
+  }
+  for (const c of kids.flat()) if (c != null) e.append(c.nodeType ? c : document.createTextNode(c));
+  return e;
+}
+const link = (u, text) => { const s = safeUrl(u); return s ? h("a", { href: s, target: "_blank", rel: "noopener noreferrer" }, text) : document.createTextNode(text); };
+
+const items = D.lanes.flatMap(l => l.items);
+const byId = Object.fromEntries(items.map(i => [i.id, i]));
+const logKind = i => (i.k === "watch" ? "watch" : i.k === "do" ? "build" : "read");
+const entries = () => [
+  ...D.log,
+  ...Object.entries(S.done).filter(([id]) => byId[id]).map(([id, d]) => ({ id: "q:" + id, d, k: logKind(byId[id]), t: byId[id].t, u: byId[id].u, auto: true })),
+  ...S.log.map(e => ({ ...e, mine: true }))
+];
+
+/* log */
+function renderLog() {
+  const ents = entries().sort((a, b) => b.d.localeCompare(a.d));
+  const days = new Set(ents.map(e => e.d));
+  let streak = 0; const c = new Date(); if (!days.has(ymd(c))) c.setDate(c.getDate() - 1);
+  while (days.has(ymd(c))) { streak++; c.setDate(c.getDate() - 1); }
+  $("#summary").textContent = `${ents.length} lines · ${streak}-day streak`;
+  const L = $("#ledger"); L.replaceChildren();
+  if (!ents.length) L.append(h("p", { class: "dim" }, "Nothing yet."));
+  let prev = "";
+  for (const e of ents) {
+    L.append(h("div", { class: "line" },
+      h("span", { class: "dim" }, e.d === prev ? "" : e.d),
+      h("span", { class: "k dim" }, e.k),
+      h("span", {}, link(e.u, e.t), e.u ? h("span", { class: "dim" }, " " + host(e.u)) : null,
+        e.mine ? h("button", { class: "link", type: "button", "aria-label": "delete line", onclick: () => { S.log = S.log.filter(x => x.id !== e.id); save(); renderLog(); } }, "x") : null)));
+    prev = e.d;
+  }
+  $("#backup").value = JSON.stringify(S);
+}
+$("#add").addEventListener("submit", ev => {
+  ev.preventDefault(); const f = ev.target, u = f.u.value.trim();
+  if (u && !safeUrl(u)) { f.u.setCustomValidity("Use an http(s) link"); f.u.reportValidity(); return; }
+  f.u.setCustomValidity("");
+  S.log.push({ id: "m" + Date.now().toString(36), d: f.d.value, k: f.k.value, t: f.t.value.trim(), u: safeUrl(u) });
+  save(); f.t.value = ""; f.u.value = ""; renderLog();
+});
+$("#restore").addEventListener("click", () => {
+  const m = $("#restore-msg");
+  try {
+    const r = JSON.parse($("#backup").value);
+    if (!r || typeof r !== "object" || !Array.isArray(r.log)) throw new Error("not a logbook backup");
+    S = { done: r.done || {}, active: r.active || {}, inbox: r.inbox || {}, log: r.log.filter(e => e && typeof e.t === "string" && /^\d{4}-\d\d-\d\d$/.test(e.d) && KINDS.includes(e.k)).map(e => ({ id: String(e.id || "m" + Math.random().toString(36).slice(2)), d: e.d, k: e.k, t: e.t.slice(0, 140), u: safeUrl(e.u || "") })) };
+    save(); renderAll(); m.textContent = "restored";
+  } catch (err) { m.textContent = "failed: " + err.message; }
+});
+
+/* resources */
+function setDone(id, on) { if (on) { S.done[id] = today(); for (const s of ["morning", "evening"]) if (S.active[s] === id) delete S.active[s]; } else delete S.done[id]; save(); renderResources(); renderLog(); }
+function setActive(slot, id) { if (id) S.active[slot] = id; else delete S.active[slot]; save(); renderResources(); }
+function renderResources() {
+  const now = $("#now"); now.replaceChildren();
+  for (const slot of ["morning", "evening"]) {
+    const it = byId[S.active[slot]];
+    now.append(h("div", {}, slot + ": ", it ? [link(it.u, it.t), " ", h("button", { class: "link", type: "button", onclick: () => setDone(it.id, true) }, "[finished]"), h("button", { class: "link", type: "button", onclick: () => setActive(slot) }, "[put back]")] : h("span", { class: "dim" }, "nothing")));
+  }
+  const inbox = $("#inbox"); inbox.replaceChildren();
+  for (const b of D.inbox) {
+    const n = S.inbox[b.id] || 0, set = v => { S.inbox[b.id] = Math.max(0, v); save(); renderResources(); };
+    inbox.append(h("div", {}, link(b.u, b.name), ": ",
+      h("button", { class: "link", type: "button", "aria-label": "one fewer " + b.name, onclick: () => set(n - 1) }, "[-]"), ` ${n} `,
+      h("button", { class: "link", type: "button", "aria-label": "one more " + b.name, onclick: () => set(n + 1) }, "[+]"),
+      h("span", { class: "dim" }, n > b.cap ? `  over ${b.cap}: stop saving, triage first` : n > 15 ? "  triage this week" : "")));
+  }
+  const lanes = $("#lanes"); lanes.replaceChildren();
+  for (const slot of ["morning", "evening"]) {
+    lanes.append(h("h2", {}, slot + "s"));
+    for (const l of D.lanes.filter(x => x.slot === slot)) {
+      const ul = h("ul");
+      for (const i of l.items) {
+        const dn = !!S.done[i.id], on = S.active[slot] === i.id;
+        ul.append(h("li", { class: (dn ? "done " : "") + (on ? "on" : "") },
+          h("input", { type: "checkbox", checked: dn, "aria-label": "finished: " + i.t, onchange: e => setDone(i.id, e.target.checked) }),
+          h("span", {}, link(i.u, i.t), " ", h("span", { class: "dim" }, i.k), " ",
+            dn ? null : h("button", { class: "link", type: "button", onclick: () => setActive(slot, on ? null : i.id) }, on ? "[on it]" : "[start]"),
+            i.n ? h("span", { class: "dim note", style: "font-weight:400" }, i.n) : null)));
+      }
+      lanes.append(h("h3", {}, `${l.title} (${l.items.filter(i => S.done[i.id]).length}/${l.items.length})`), ul);
+    }
+  }
+}
+
+function show() {
+  const t = location.hash === "#resources" ? "resources" : "log";
+  for (const n of ["log", "resources"]) { $("#pg-" + n).hidden = n !== t; const a = $("#n-" + n); if (n === t) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }
+}
+function renderAll() { renderLog(); renderResources(); }
+addEventListener("hashchange", show);
+$("#add").d.value = today();
+renderAll(); show();
+</script>
+</body>
+</html>
