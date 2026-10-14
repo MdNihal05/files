@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Workflow map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Drawn in archypaint's own language: white paper, faint grid, soft category tones, rounded boxes, dashed flow. */
+:root{--paper:#fff;--grid:#f3f3f8;--ink:#141418;--mid:#565660;--accent:#5b57d1;--card:#fff;
+ --data:#5aa9e6;--cache:#f0913a;--network:#4cc38a;--compute:#a48af0;--queue:#34c6cf;--security:#e879b0;--client:#a9b3be;--external:#d4bb6a;--ui:#fff}
+:root[data-theme=dark]{--paper:#18181b;--grid:#222227;--ink:#e4e4e7;--mid:#a1a1aa;--accent:#ff6f5e;--card:#202024;--ui:#202024}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--paper:#18181b;--grid:#222227;--ink:#e4e4e7;--mid:#a1a1aa;--accent:#ff6f5e;--card:#202024;--ui:#202024}}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);overflow:hidden}
+body{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:13px}
+#stage{position:fixed;inset:0;cursor:grab;touch-action:none;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:var(--g,40px) var(--g,40px);background-position:var(--gx,0) var(--gy,0)}
+#stage.drag{cursor:grabbing}
+svg{width:100%;height:100%;display:block}
+.panel{position:fixed;background:var(--ui);border:1px solid color-mix(in srgb,var(--ink) 12%,transparent);border-radius:16px;box-shadow:0 10px 30px -14px rgba(20,20,40,.25)}
+#card{left:18px;top:14px;right:178px;display:flex;gap:18px;align-items:center;padding:10px 16px;flex-wrap:wrap}
+#card h1{font-size:15px;margin:0;letter-spacing:-.01em;white-space:nowrap}
+#card p{margin:0;color:var(--mid);font-size:11.5px;line-height:1.45;flex:1 1 280px;min-width:200px}
+#card .seg{flex:0 0 330px}
+.seg{display:flex;background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:10px;padding:3px;gap:2px}
+.seg button{flex:1;border:0;background:none;color:var(--mid);font:inherit;font-size:11.5px;padding:6px 4px;border-radius:8px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ui);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.15);font-weight:700}
+#tools{right:18px;bottom:18px;display:flex;gap:6px;padding:6px;border-radius:14px}
+#tools button{border:0;background:none;color:var(--ink);font:inherit;font-size:15px;width:34px;height:34px;border-radius:9px;cursor:pointer}
+#tools button:hover,.seg button:hover{background:color-mix(in srgb,var(--ink) 8%,transparent)}
+#lvl{position:fixed;right:18px;top:24px;font-size:11.5px;color:var(--mid);padding:7px 12px;border-radius:99px}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+/* diagram */
+.box rect.b{fill:color-mix(in srgb,var(--c) 13%,var(--card));stroke:var(--c);stroke-width:2;rx:14}
+.pan rect.b{fill:color-mix(in srgb,var(--c) 5%,var(--paper));stroke:var(--c);stroke-width:2;stroke-dasharray:none;rx:26;opacity:.95}
+.dashed rect.b{stroke-dasharray:9 5}
+.t1{font-size:52px;font-weight:700;fill:var(--ink);letter-spacing:-.02em}.d1{font-size:26px;fill:var(--mid)}
+.t2{font-size:17px;font-weight:700;fill:var(--ink)}.s2{font-size:12.5px;fill:var(--mid)}
+.t3{font-size:12px;fill:var(--ink)}.g2{font-size:15px;font-weight:700;fill:var(--ink)}.sum{font-size:32px;fill:var(--ink)}
+.chip{font-size:12px;fill:var(--ink)}
+.edge{fill:none;stroke:var(--c,var(--accent));stroke-width:2.2;stroke-dasharray:8 5;animation:flow 1.1s linear infinite;opacity:.85}
+.edge.soft{opacity:.5}
+@keyframes flow{to{stroke-dashoffset:-13}}
+.lv2,.lv3{transition:opacity .25s}
+svg[data-show="1"] .lv2,svg[data-show="1"] .lv3,svg[data-show="2"] .lv3{opacity:0;pointer-events:none}
+svg[data-show="1"] .l2e,svg[data-show="1"] .l3e,svg[data-show="2"] .l3e{opacity:0}
+svg[data-show="1"] .lv1d{opacity:1}svg:not([data-show="1"]) .lv1d{opacity:0}
+@media(prefers-reduced-motion:reduce){.edge{animation:none}}
+</style></head><body>
+<div id="stage"><svg id="svg" role="img" aria-label="Map of Nihal's workflow from intake to public proof, with Claude Code underneath"></svg></div>
+<div class="panel" id="card"><h1>How I work, as a map</h1><p>Left to right: what comes in, how it sticks, what I practise, what ships. Claude Code runs underneath all of it. Scroll to zoom in for detail, drag to pan.</p>
+<div class="seg" id="seg" role="group" aria-label="Detail level"><button data-l="auto" aria-pressed="true">Auto</button><button data-l="1" aria-pressed="false">Big picture</button><button data-l="2" aria-pressed="false">Tracks</button><button data-l="3" aria-pressed="false">Everything</button></div></div>
+<div class="panel" id="lvl"></div>
+<div class="panel" id="tools"><button id="out" aria-label="Zoom out">−</button><button id="fit" aria-label="Fit to screen">⤢</button><button id="in" aria-label="Zoom in">+</button><button id="th" aria-label="Toggle theme">◐</button></div>
+<script>
+const W=3220,H=1900,NS="http://www.w3.org/2000/svg";
+const svg=document.getElementById("svg"),N={};let html="";
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const C={data:"var(--data)",cache:"var(--cache)",network:"var(--network)",compute:"var(--compute)",queue:"var(--queue)",security:"var(--security)",client:"var(--client)",external:"var(--external)",accent:"var(--accent)"};
+/* panel = level-1 region */
+function panel(id,x,y,w,h,c,title,desc,sum=[]){N[id]={x,y,w,h};html+=`<g class="pan"><rect class="b" style="--c:${C[c]}" x="${x}" y="${y}" width="${w}" height="${h}"/><text class="t1" x="${x+30}" y="${y+84}">${esc(title)}</text><text class="d1 lv1d" x="${x+30}" y="${y+126}">${esc(desc)}</text>${sum.map((t,i)=>`<text class="sum lv1d" x="${x+30}" y="${y+212+i*54}">${esc(t)}</text>`).join("")}</g>`}
+/* box = level-2 node; lines = level-3 text */
+function box(id,x,y,w,h,c,title,sub,lines=[],dashed=false,goal=""){N[id]={x,y,w,h};const off=goal?60:0;
+ html+=`<g class="box ${dashed?"dashed":""}"><g class="lv2"><rect class="b" style="--c:${C[c]}" x="${x}" y="${y}" width="${w}" height="${h}"/><text class="t2" x="${x+18}" y="${y+30}">${esc(title)}</text><text class="s2" x="${x+18}" y="${y+52}">${esc(sub)}</text>${goal?`<text class="g2" x="${x+18}" y="${y+100}">${esc(goal)}</text>`:""}</g>`;
+ if(lines.length)html+=`<g class="lv3">${lines.map((l,i)=>`<text class="t3" x="${x+18}" y="${y+84+off+i*21}">${esc(l)}</text>`).join("")}</g>`;
+ html+=`</g>`}
+/* small node for chains */
+function chip(id,x,y,w,h,c,text){N[id]={x,y,w,h};html+=`<g class="box lv2"><rect class="b" style="--c:${C[c]}" x="${x}" y="${y}" width="${w}" height="${h}" rx="10"/><text class="chip" x="${x+w/2}" y="${y+h/2+4}" text-anchor="middle">${esc(text)}</text></g>`}
+const side=(n,s)=>({l:[n.x,n.y+n.h/2],r:[n.x+n.w,n.y+n.h/2],t:[n.x+n.w/2,n.y],b:[n.x+n.w/2,n.y+n.h]}[s]);
+const edges=[];
+function edge(a,sa,b,sb,lv,c="accent",soft=false){edges.push({a,sa,b,sb,lv,c,soft})}
+function drawEdges(){let s="";for(const e of edges){const A=side(N[e.a],e.sa),B=side(N[e.b],e.sb);const hz=e.sa==="l"||e.sa==="r";const k=Math.max(60,(hz?Math.abs(B[0]-A[0]):Math.abs(B[1]-A[1]))*.45);
+ const c1=hz?[A[0]+(e.sa==="r"?k:-k),A[1]]:[A[0],A[1]+(e.sa==="b"?k:-k)],c2=hz?[B[0]+(e.sb==="l"?-k:k),B[1]]:[B[0],B[1]+(e.sb==="t"?-k:k)];
+ s+=`<path class="edge l${e.lv}e ${e.soft?"soft":""}" style="--c:${C[e.c]}" marker-end="url(#ah)" d="M${A} C${c1} ${c2} ${B}"/>`}
+ return s}
+
+/* ---- guard rails (top band) ---- */
+panel("g",60,30,3100,190,"security","GUARD RAILS","the rules that never bend");
+const gr=[["Office vs personal","/Projects is strict: no commit, push or DB write unless told"],["Commits","only when told, per change; development first, main by merge"],["Claims","verified / reasoned / unverified, never a guess dressed as a fact"],["Never","publish Artifacts, log secrets, mix work into the log"],["Tokens & power","short replies, 2-3 agents max, machine runs low on power"]];
+gr.forEach((g,i)=>box("g"+i,90+i*616,110,584,92,"security",g[0],g[1].slice(0,62)))
+
+/* ---- intake ---- */
+panel("in",60,250,540,1020,"data","INTAKE","what I take in",["reading","videos","problems","code to read","","office work stays out"]);
+box("rd",90,340,480,170,"data","Reading","blogs · papers · books",["DDIA · Ousterhout · CS186 notes","Instacart / Contentful search posts","read-with-Claude: he reads, I ask"]);
+box("vd",90,530,480,170,"data","Videos","three courses, 329 videos, 212 h",["CMU DB · Kleppmann · system design","15 playlists, kept in the Stacks library","bot queues: morning systems, evening Go"]);
+box("pb",90,720,480,170,"data","Problems","CF · LC · CC · AtCoder · CSES",["daily problem from 2026-10-14","contest reminders from the bot","rating tracked on /api/cp-stats"]);
+box("cd",90,910,480,150,"data","Code to read","GitHub repos, source, RFCs",["read real systems, contribute where it fits"]);
+box("of",90,1080,480,160,"external","Office","kept out of this map on purpose",["production backend, strict safety rules","never logged, never committed from here"],true);
+
+/* ---- understand ---- */
+panel("un",720,250,740,1020,"compute","UNDERSTAND","how it sticks",["read","understand","implement","project, then repeat","","hints first, answers last","retrieve, predict, explain back"]);
+box("l1",750,340,320,130,"compute","1 Read","",["new idea, source in hand"]);
+box("l2",1090,340,340,130,"compute","2 Understand","",["explain it back, first principles"]);
+box("l3",1090,520,340,130,"compute","3 Implement","",["he types it, small pieces"]);
+box("l4",750,520,320,130,"compute","4 Project","",["use it in something real, repeat"]);
+box("lad",750,690,680,200,"compute","Mentor ladder","hints before answers",["question → hint → stronger hint → direction","→ partial explanation → full solution","(full solution only when he asks for it)"]);
+box("lock",750,910,680,170,"compute","Lock-in protocol","so it is not read once and lost",["retrieve first · predict before reveal · explain back","transfer test in a new scenario · spaced review"]);
+box("rig",750,1100,680,140,"compute","Rigor","every claim labelled",["verified (ran it) · reasoned · unverified","complexity gets a derivation, not an assertion"]);
+edge("l1","r","l2","l",2,"compute");edge("l2","b","l3","t",2,"compute");edge("l3","l","l4","r",2,"compute");edge("l4","t","l1","b",2,"compute");
+
+/* ---- practice tracks ---- */
+panel("tr",1580,250,1090,1020,"client","PRACTICE","six tracks, same loop",["CP · Go · Systems","Projects · Writing · Interviews"]);
+const tx=[1610,1960,2310];
+box("cp",tx[0],340,330,430,"cache","CP","daily problem, then upsolve",["constraints → brute force","→ bottleneck → invariant","→ derive → complexity → edges","hand-trace the smallest case","stuck 2 days: editorial,","then re-solve unaided","templates in competitive-programming"],false,"get fast and exact");
+box("go",tx[1],340,330,430,"queue","Go","learn it by typing it",["PLAN.md stages, folders by topic","concept → he writes a tiny piece","→ I run it and review","tests that fail when mutated","LOG.md is the event log","code lives in learning_go"],false,"own the language");
+box("sy",tx[2],340,330,430,"network","Systems","design · databases · distributed",["morning block, playlists + books","case stacks: one lesson, many voices","toy storage engine, Raft KV, LSM","notes become blog posts","next: the Stacks queue in the bot"],false,"think like the infra");
+box("pj",tx[0],800,330,440,"security","Projects","idea to shipped",["ideas parked in todo-projects","brief first, ask once","mocks → approval → build","frontend-design, backend-api skills","verify: render, curl, tests","development → main when told"],false,"ship real things");
+box("wr",tx[1],800,330,440,"external","Writing","blog and docs, his voice",["he drafts, I only suggest","write-blog-post skill","visuals checked by rendering","write-human for READMEs, commits"],false,"explain it clearly");
+box("iv",tx[2],800,330,440,"client","Interviews","mock rounds on request",["I interview, he answers","AI and no-AI modes","honest feedback + weakness list","weak spots go back to CP / Systems"],false,"stay sharp under pressure");
+edge("iv","t","sy","b",2,"client",true);
+
+/* ---- ship ---- */
+panel("sh",2790,250,370,1020,"network","SHIP","public proof",["activity log","learning bot","portfolio","GitHub","blog"]);
+box("dl",2815,340,320,170,"network","Activity log","devlog → /log + heatmap",["one entry per finished milestone","never office, ideas or secrets"]);
+box("bt",2815,530,320,190,"network","Learning bot","Go · MongoDB · Render",["/api/logs /cp-stats /portfolio","Telegram: contests, timer, projects"]);
+box("pf",2815,740,320,170,"network","Portfolio","mdnihal.online",["log page, heatmap, CP ratings"]);
+box("gh",2815,930,320,160,"network","GitHub","public repos",["learning_go · archypaint · CP library"]);
+box("bl",2815,1110,320,140,"network","Blog","long-form write-ups",["figures built and verified"]);
+
+/* ---- Claude OS ---- */
+panel("ai",60,1310,3100,560,"accent","CLAUDE CODE","the operating system behind every track",["rules · skills · memory · hygiene · agents","a mistake is not fixed until its class is written down"]);
+const ai=[["rules","Rules","CLAUDE.md, global + personal",["mentor, not answer machine","separate office / personal / learning","contradict me when I am wrong"]],["skills","Skills","loaded before the work",["frontend-design · backend-api","write-blog-post · write-human","lockin · mock-interview · iterate"]],["mem","Memory","one fact per file, indexed",["MEMORY.md is read every session","feedback, projects, references"]],["hy","Hygiene","hooks and cleanup",["scratchpad empty before a reply","temp files deleted same command"]],["ag","Agents","who does what",["Sonnet default, Haiku for chores","never Opus, 2-3 heavy agents max"]]];
+ai.forEach((a,i)=>box(a[0],90+i*616,1390,584,190,"accent",a[1],a[2],a[3]));
+const lp=["work","feedback or mistake","root cause","fix it","extract the class","write the rule","sync claude repo","next round starts higher"];
+lp.forEach((t,i)=>{chip("p"+i,90+i*386,1690,350,64,"accent",t);if(i)edge("p"+(i-1),"r","p"+i,"l",2,"accent")});
+html+=`<text class="s2 lv2" x="90" y="1672">the learning loop: a mistake is not fixed until its failure class is written down</text>`;
+
+/* ---- big-picture flows ---- */
+edge("in","r","un","l",1);edge("un","r","tr","l",1);edge("tr","r","sh","l",1);
+edge("ai","t","un","b",1,"accent",true);edge("ai","t","tr","b",1,"accent",true);
+/* detail flows */
+edge("rd","r","l1","l",2,"data");edge("vd","r","l1","l",2,"data",true);
+
+
+
+
+svg.innerHTML=`<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" fill="var(--accent)"/></marker></defs><g id="world">${html}${drawEdges()}</g>`;
+
+/* ---- pan / zoom / semantic levels: k is the real pixel scale of the world ---- */
+const stage=document.getElementById("stage"),world=document.getElementById("world");
+let k=.4,vx=0,vy=0,mode="auto";const TOP=96,KMIN=.15,KMAX=4;
+const box_=()=>svg.getBoundingClientRect();
+function apply(){
+ world.setAttribute("transform",`translate(${vx} ${vy}) scale(${k})`);
+ const show=mode==="auto"?(k<.55?1:k<1?2:3):+mode;svg.dataset.show=show;
+ document.getElementById("lvl").textContent=["","Big picture","Tracks","Everything"][show]+" · "+Math.round(k*100)+"%";
+ stage.style.setProperty("--g",40*k+"px");stage.style.setProperty("--gx",vx+"px");stage.style.setProperty("--gy",vy+"px")}
+function fit(){const r=box_();svg.setAttribute("viewBox",`0 0 ${r.width} ${r.height}`);
+ k=Math.min(r.width/W,(r.height-TOP)/H)*.98;vx=(r.width-W*k)/2;vy=TOP+((r.height-TOP)-H*k)/2;apply()}
+function zoomAt(f,cx,cy){const nk=Math.min(KMAX,Math.max(KMIN,k*f)),g=nk/k;vx=cx-(cx-vx)*g;vy=cy-(cy-vy)*g;k=nk;apply()}
+stage.addEventListener("wheel",e=>{e.preventDefault();const r=box_();zoomAt(Math.exp(-e.deltaY*.0015),e.clientX-r.left,e.clientY-r.top)},{passive:false});
+let dr=null;
+stage.addEventListener("pointerdown",e=>{dr={x:e.clientX,y:e.clientY,vx,vy};stage.classList.add("drag");stage.setPointerCapture(e.pointerId)});
+stage.addEventListener("pointermove",e=>{if(!dr)return;vx=dr.vx+e.clientX-dr.x;vy=dr.vy+e.clientY-dr.y;apply()});
+stage.addEventListener("pointerup",()=>{dr=null;stage.classList.remove("drag")});
+const mid=()=>{const r=box_();return[r.width/2,r.height/2]};
+document.getElementById("in").onclick=()=>zoomAt(1.4,...mid());
+document.getElementById("out").onclick=()=>zoomAt(1/1.4,...mid());
+document.getElementById("fit").onclick=fit;
+document.getElementById("seg").onclick=e=>{const b=e.target.closest("button");if(!b)return;mode=b.dataset.l;[...document.querySelectorAll("#seg button")].forEach(x=>x.setAttribute("aria-pressed",x===b));apply()};
+document.getElementById("th").onclick=()=>{const r=document.documentElement;r.dataset.theme=(r.dataset.theme||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"))==="dark"?"light":"dark"};
+addEventListener("resize",fit);fit();
+</script></body></html>
